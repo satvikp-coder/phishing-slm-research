@@ -15,14 +15,19 @@ H1: CoT-distilled LoRA fine-tuning will produce smaller accuracy degradation tha
 - [ ] Week 2: dataset acquisition and cleaning
 - [ ] Week 3: classical baseline
 - [ ] Week 4: zero-shot LLM baselines
-- [ ] Week 5: naive LoRA fine-tuning
-- [ ] Week 6: CoT-distilled LoRA fine-tuning
+- [x] Week 5: naive LoRA fine-tuning — pipeline validated end-to-end on Qwen2.5-1.5B-Instruct (placeholder data; real dataset pending Week 2)
+- [ ] Week 6: CoT-distilled LoRA fine-tuning — pipeline exists (`USE_COT=True` toggle), not yet run/validated
 - [ ] Week 7: adversarial test set construction
 - [ ] Week 8: main experiment
 - [ ] Week 9: sanity checks, lock results
 - [ ] Week 10: ablations
 - [ ] Week 11: statistics, error analysis
 - [ ] Week 12: write-up
+
+## Fine-tuning notebook
+`finetuning/Phishing_SLM_QLoRA_Starter.ipynb` — Colab-ready QLoRA fine-tuning pipeline. Mounts Google Drive so checkpoints survive disconnects; single `USE_COT` toggle switches between the naive (Week 5) and CoT-distilled (Week 6) arms so the two are directly comparable. Validated Sep 2026 on Qwen2.5-1.5B-Instruct, Tesla T4, naive arm — trains, saves adapter to Drive, and produces coherent inference output. **Known issue to handle in the Week 8 eval harness:** the model doesn't reliably stop generating right after the label even in the naive arm; label-parsing must extract from the start of the response rather than assume a bare single-word output.
+
+Model checkpoints themselves are NOT tracked in this repo (see `.gitignore`) — they live in Google Drive under `phishing-slm-research/finetuning/checkpoints/`.
 
 ## Repo structure
 ```
