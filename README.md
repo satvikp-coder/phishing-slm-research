@@ -12,7 +12,7 @@ H1: CoT-distilled LoRA fine-tuning will produce smaller accuracy degradation tha
 
 ## Status
 - [x] Week 1: literature grounding, environment setup, RQ finalized
-- [ ] Week 2: dataset acquisition and cleaning
+- [x] Week 2: dataset acquisition and cleaning — 20,681 train / 2,954 val / 5,910 test (locked), ~42.3% phishing/spam, stratified by label × source. See `data/data_summary.md`.
 - [ ] Week 3: classical baseline
 - [ ] Week 4: zero-shot LLM baselines
 - [x] Week 5: naive LoRA fine-tuning — pipeline validated end-to-end on Qwen2.5-1.5B-Instruct (placeholder data; real dataset pending Week 2)
@@ -23,6 +23,9 @@ H1: CoT-distilled LoRA fine-tuning will produce smaller accuracy degradation tha
 - [ ] Week 10: ablations
 - [ ] Week 11: statistics, error analysis
 - [ ] Week 12: write-up
+
+## Dataset
+Built in `data/Week2_Data_Acquisition.ipynb` from `puyang2025/seven-phishing-email-datasets` (Hugging Face) — combines Enron, CEAS-08, SpamAssassin, and TREC-05/06/07 into one unified, cleaned, stratified train/val/test split. Full details and known limitations in `data/data_summary.md`. **Test set is locked — do not open again until Week 8.**
 
 ## Fine-tuning notebook
 `finetuning/Phishing_SLM_QLoRA_Starter.ipynb` — Colab-ready QLoRA fine-tuning pipeline. Mounts Google Drive so checkpoints survive disconnects; single `USE_COT` toggle switches between the naive (Week 5) and CoT-distilled (Week 6) arms so the two are directly comparable. Validated Sep 2026 on Qwen2.5-1.5B-Instruct, Tesla T4, naive arm — trains, saves adapter to Drive, and produces coherent inference output. **Known issue to handle in the Week 8 eval harness:** the model doesn't reliably stop generating right after the label even in the naive arm; label-parsing must extract from the start of the response rather than assume a bare single-word output.
