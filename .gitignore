@@ -6,5 +6,8 @@ data/raw/*
 !data/raw/.gitkeep
 finetuning/checkpoints/*
 !finetuning/checkpoints/.gitkeep
+# ignore all CSVs (raw/processed emails must never be committed) ...
 *.csv
-!data/processed/.gitkeep
+# ... except small results tables, which ARE research artifacts
+!eval/results/*.csv
+!eval/results/

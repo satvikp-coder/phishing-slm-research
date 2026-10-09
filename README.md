@@ -13,16 +13,19 @@ H1: CoT-distilled LoRA fine-tuning will produce smaller accuracy degradation tha
 ## Status
 - [x] Week 1: literature grounding, environment setup, RQ finalized
 - [x] Week 2: dataset acquisition and cleaning — 20,681 train / 2,954 val / 5,910 test (locked), ~42.3% phishing/spam, stratified by label × source. See `data/data_summary.md`.
-- [ ] Week 3: classical baseline
+- [ ] Week 3: classical baseline — notebook written (`baselines/Week3_Classical_Baseline.ipynb`), NOT YET RUN
 - [ ] Week 4: zero-shot LLM baselines
-- [x] Week 5: naive LoRA fine-tuning — pipeline validated end-to-end on Qwen2.5-1.5B-Instruct (placeholder data; real dataset pending Week 2)
-- [x] Week 6: CoT-distilled LoRA fine-tuning — pipeline validated end-to-end on Qwen2.5-1.5B-Instruct (placeholder data; real dataset pending Week 2)
+- [~] Week 5: naive LoRA fine-tuning — INFRA-VALIDATED ONLY (3 placeholder rows, Qwen2.5-1.5B, T4). No real result. Not yet run on real train split; see docs/handover/06 hazards first
+- [~] Week 6: CoT-distilled LoRA fine-tuning — INFRA-VALIDATED ONLY (placeholder rows). Teacher-generated `reasoning` column does not exist yet
 - [ ] Week 7: adversarial test set construction
 - [ ] Week 8: main experiment
 - [ ] Week 9: sanity checks, lock results
 - [ ] Week 10: ablations
 - [ ] Week 11: statistics, error analysis
 - [ ] Week 12: write-up
+
+## Handover / agent onboarding
+See `docs/handover/00_START_HERE.md` (full context package for continuing work in a local terminal agent).
 
 ## Dataset
 Built in `data/Week2_Data_Acquisition.ipynb` from `puyang2025/seven-phishing-email-datasets` (Hugging Face) — combines Enron, CEAS-08, SpamAssassin, and TREC-05/06/07 into one unified, cleaned, stratified train/val/test split. Full details and known limitations in `data/data_summary.md`. **Test set is locked — do not open again until Week 8.**
