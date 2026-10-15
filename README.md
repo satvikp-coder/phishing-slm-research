@@ -19,7 +19,7 @@ H1: CoT-distilled LoRA fine-tuning will produce smaller accuracy degradation tha
 - [x] Week 1: literature grounding, environment setup, RQ finalized
 - [x] Week 2: dataset acquisition and cleaning — 20,681 train / 2,954 val / 5,910 test (locked), ~42.3% phishing/spam, stratified by label × source. See `data/data_summary.md`.
 - [x] Week 3: classical baseline — executed on train/val; LR F1=0.9687, SVM F1=0.9646. Results in eval/results/baseline_results.csv
-- [ ] Week 4: zero-shot LLM baselines
+- [x] Week 4: zero-shot LLM baselines — executed on val; Qwen2.5-1.5B F1=0.5811, Groq zero-shot pipeline integrated.
 - [~] Week 5: naive LoRA fine-tuning — INFRA-VALIDATED ONLY (3 placeholder rows, Qwen2.5-1.5B, T4). No real result. Not yet run on real train split; see docs/handover/06 hazards first
 - [~] Week 6: CoT-distilled LoRA fine-tuning — INFRA-VALIDATED ONLY (placeholder rows). Teacher-generated `reasoning` column does not exist yet
 - [ ] Week 7: adversarial test set construction
