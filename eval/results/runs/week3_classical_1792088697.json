@@ -1,0 +1,83 @@
+{
+  "run_id": "week3_classical_1792088697",
+  "timestamp": "2026-10-15 23:54:57",
+  "git_hash": "470018c1220e68b832bb94dc2eb0758c78baea9d",
+  "library_versions": {
+    "python": "3.13.14 (tags/v3.13.14:fd17997, Jun 10 2026, 13:03:48) [MSC v.1944 64 bit (AMD64)]",
+    "scikit-learn": "1.8.0",
+    "pandas": "2.3.3",
+    "numpy": "2.4.0"
+  },
+  "data_sha256": {
+    "phishing_train.csv": "81479ac035da02b8248630534f02c80ec8ec585dc5b8bf4314ec2f6a61a2d825",
+    "phishing_val.csv": "3376f0281e414842f7903360b59606d03f5e0a8b4c31d286e2727caa673c0c9f"
+  },
+  "models": {
+    "logistic_regression": {
+      "best_params": {
+        "clf__C": 10.0,
+        "tfidf__max_features": 20000,
+        "tfidf__ngram_range": [
+          1,
+          2
+        ]
+      },
+      "best_cv_f1": 0.9641904779532777,
+      "fit_time_sec": 220.48903369903564,
+      "val_metrics": {
+        "model": "TF-IDF + LogisticRegression",
+        "split": "val",
+        "accuracy": 0.973595125253893,
+        "precision": 0.9702572347266881,
+        "recall": 0.9671474358974359,
+        "f1": 0.9686998394863563,
+        "auroc": 0.9962810367631587,
+        "false_positive_rate": 0.021688159437280186,
+        "fit_time_sec": 220.48903369903564,
+        "latency_ms_per_email": 0.4251668319237256,
+        "cost_usd_per_1000_emails": 0.0
+      },
+      "val_per_source_f1": {
+        "Assassin": 0.959409594095941,
+        "CEAS-08": 0.9909255898366606,
+        "Enron": 0.9758241758241758,
+        "TREC-05": 0.9615384615384616,
+        "TREC-06": 0.944,
+        "TREC-07": 0.9617486338797814
+      }
+    },
+    "linear_svm": {
+      "best_params": {
+        "clf__estimator__C": 1.0,
+        "tfidf__max_features": 20000,
+        "tfidf__ngram_range": [
+          1,
+          2
+        ]
+      },
+      "best_cv_f1": 0.9642164825514179,
+      "fit_time_sec": 217.1885871887207,
+      "val_metrics": {
+        "model": "TF-IDF + LinearSVM",
+        "split": "val",
+        "accuracy": 0.970209884901828,
+        "precision": 0.967741935483871,
+        "recall": 0.9615384615384616,
+        "f1": 0.9646302250803859,
+        "auroc": 0.9959790295187424,
+        "false_positive_rate": 0.023446658851113716,
+        "fit_time_sec": 217.1885871887207,
+        "latency_ms_per_email": 0.510399698323306,
+        "cost_usd_per_1000_emails": 0.0
+      },
+      "val_per_source_f1": {
+        "Assassin": 0.959409594095941,
+        "CEAS-08": 0.9909584086799277,
+        "Enron": 0.9711751662971175,
+        "TREC-05": 0.9519230769230769,
+        "TREC-06": 0.9285714285714286,
+        "TREC-07": 0.9614678899082569
+      }
+    }
+  }
+}

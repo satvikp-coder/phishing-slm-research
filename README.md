@@ -1,5 +1,9 @@
 # Small but Sufficient? SLM vs. LLM Phishing-Email Detection
 
+[![Open In Colab: QLoRA Fine-Tuning](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/satvikp-coder/phishing-slm-research/blob/main/finetuning/Phishing_SLM_QLoRA_Starter.ipynb)
+[![Open In Colab: Week 3 Classical Baseline](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/satvikp-coder/phishing-slm-research/blob/main/baselines/Week3_Classical_Baseline.ipynb)
+[![Open In Colab: Week 2 Data Acquisition](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/satvikp-coder/phishing-slm-research/blob/main/data/Week2_Data_Acquisition.ipynb)
+
 ## Research Question (finalized, Week 1)
 Does reasoning-trace-distilled (CoT) LoRA fine-tuning of small (≤3B) language models improve phishing-email classification robustness to LLM-rephrased/generated phishing more than naive label-only LoRA fine-tuning, and how do both compare to strong zero-shot prompting (SLM and proprietary)?
 
@@ -13,7 +17,7 @@ H1: CoT-distilled LoRA fine-tuning will produce smaller accuracy degradation tha
 ## Status
 - [x] Week 1: literature grounding, environment setup, RQ finalized
 - [x] Week 2: dataset acquisition and cleaning — 20,681 train / 2,954 val / 5,910 test (locked), ~42.3% phishing/spam, stratified by label × source. See `data/data_summary.md`.
-- [ ] Week 3: classical baseline — notebook written (`baselines/Week3_Classical_Baseline.ipynb`), NOT YET RUN
+- [x] Week 3: classical baseline — executed on train/val; LR F1=0.9687, SVM F1=0.9646. Results in eval/results/baseline_results.csv
 - [ ] Week 4: zero-shot LLM baselines
 - [~] Week 5: naive LoRA fine-tuning — INFRA-VALIDATED ONLY (3 placeholder rows, Qwen2.5-1.5B, T4). No real result. Not yet run on real train split; see docs/handover/06 hazards first
 - [~] Week 6: CoT-distilled LoRA fine-tuning — INFRA-VALIDATED ONLY (placeholder rows). Teacher-generated `reasoning` column does not exist yet

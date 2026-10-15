@@ -1,0 +1,11 @@
+# requirements.txt — Pinned dependencies for phishing-slm-research
+numpy==2.4.0
+pandas==2.3.3
+scikit-learn==1.8.0
+datasets==5.1.0
+torch==2.11.0+cpu
+transformers>=4.48.0
+accelerate>=1.2.0
+peft>=0.14.0
+trl>=0.14.0
+bitsandbytes>=0.45.0
