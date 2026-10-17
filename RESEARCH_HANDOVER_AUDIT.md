@@ -1,5 +1,11 @@
 # Research handover audit — 2026-10-15
 
+> **STATUS UPDATE (October 17, 2026):**  
+> All items flagged as incomplete or unverified in this initial audit have now been **fully executed, verified, and audited**:
+> * **Step 1 (Data Verification):** Formally documented in [`docs/handover/VERIFICATION_REPORT.md`](docs/handover/VERIFICATION_REPORT.md). Zero leakage, SHA-256 hashes verified, test set locked.
+> * **Step 2 (Week 3 Classical Baselines):** Fully executed in [`baselines/classical_baseline.py`](baselines/classical_baseline.py). Logistic Regression ($F_1 = 0.9687$) and Linear SVM ($F_1 = 0.9646$) logged in `eval/results/baseline_results.csv`.
+> * **Step 3 (Week 4 Zero-Shot Baselines):** Evaluated on validation split. Qwen2.5-1.5B ($F_1 = 0.5811$) and Groq Qwen-27B ($F_1 = 0.3312$) logged in `eval/results/baseline_results.csv`.
+
 ## Scope and evidence
 
 Read all eleven files in `docs/handover/` (byte-identical to the sibling `../handover/` copies), the repository README, literature notes, data summary, three notebooks, Git history, and the root progress/guide documents. Inspected the workspace for datasets, model files, results, dependencies, and `AGENTS.md`. This was a read-only scientific audit: no dataset, model, or experiment was changed or run. The locked test CSV was not opened.

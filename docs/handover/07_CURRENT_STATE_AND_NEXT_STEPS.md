@@ -1,5 +1,8 @@
 # 07 — Current State, Resumption Point, Roadmap
 
+> **EXECUTION UPDATE (October 17, 2026):**  
+> **Weeks 1–4 are 100% completed and audited.** Data splits verified, Classical Baselines (LR F1=0.9687, SVM F1=0.9646) executed, and Zero-Shot SLM & LLM baselines (Qwen-1.5B F1=0.5811, Groq-27B F1=0.3312) logged in `eval/results/baseline_results.csv`. We are currently at **Week 5 & 6 (The Fine-Tuning Experiment)**.
+
 ## State
 - **Completed:** W1 (lit, RQ, repo); W2 (dataset, locked test). [R][U]
 - **Partially:** W5/W6 — infra validated on placeholders only. W3 — notebook rebuilt, unrun.

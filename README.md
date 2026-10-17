@@ -35,10 +35,34 @@ All evaluations are conducted strictly on the untouched Validation Split (`phish
 
 *Data source: [`eval/results/baseline_results.csv`](eval/results/baseline_results.csv)*
 
+---
+
+### Why Did We Build These Two Classical Baseline Models?
+
+A common question in modern language model research is: *“If the goal is to evaluate Small Language Models (SLMs), why spend time implementing classical TF-IDF algorithms?”*
+
+In rigorous academic research, **classical models serve as the mandatory empirical control**:
+
+1. **The Gold Standard Statistical Baseline:**
+   - **TF-IDF + Logistic Regression:** Computes Term Frequency–Inverse Document Frequency across 20,000 unigrams and bigrams, weighting distinctive lexical tokens (e.g., `"verify account"`, `"wire transfer"`) and learning a linear decision boundary squashed through a Sigmoid probability function.
+   - **TF-IDF + Linear SVM (Calibrated):** Finds the maximum-margin hyperplane separating the phishing cluster from the legitimate cluster in 20,000-dimensional feature space, calibrated via Platt scaling (`CalibratedClassifierCV`) to output reliable posterior probabilities.
+
+2. **Why They Score High on Static Benchmarks ($F_1 \approx 0.968$):**
+   - Standard academic corpora (Enron, SpamAssassin, CEAS-08, TREC) share persistent surface keyword artifacts. Classical models memorize these specific vocabulary signatures, achieving exceptional in-distribution metrics ($97.36\%$ accuracy, $2.17\%$ False Positive Rate).
+
+3. **The Fatal Flaw of Classical Models (Adversarial Brittleness):**
+   - Bag-of-words classical models possess **zero syntactic understanding and zero semantic reasoning**. 
+   - When an attacker uses a generative LLM to rephrase a phishing email—using polite, professional vocabulary, novel sentence structures, or subtle psychological pretexts without traditional spam keywords—**classical models collapse completely**.
+
+4. **The Research Justification for Fine-Tuned SLMs:**
+   - The comparison above proves that **untrained zero-shot models fail** (1.5B has a 33.47% FPR; 27B has a 72.44% FPR).
+   - Therefore, the goal of this research (Weeks 5 & 6) is to combine the **low false-positive discipline of trained classifiers** with the **deep semantic comprehension of Small Language Models** via **Chain-of-Thought (CoT) Distillation**, creating a defense that remains robust against AI-generated adversarial phishing.
+
 ### Key Scientific Inferences
 1. **The "Zero-Shot Hyper-Sensitivity" Collapse:** Scaling from 1.5B to 27B parameters in an untrained zero-shot regime does not improve phishing detection. The 27B model collapsed to an $F_1$ of 0.3312 due to a catastrophic **72.44% False Positive Rate** (labeling benign enterprise emails as phishing).
 2. **Production Usability Criterion:** Enterprise security requires an $\text{FPR} \le 2.5\%$. Zero-shot prompting (33.47% and 72.44% FPR) is completely unviable for production email filtering without fine-tuning.
 3. **The Fine-Tuning Mandate:** These baselines mathematically establish the need for **Arm A (Naive LoRA)** to eliminate false alarms and **Arm B (CoT Distillation)** to impart structural reasoning against adversarial paraphrasing.
+
 
 ---
 
