@@ -267,13 +267,21 @@ def main():
     if cuda_available:
         model = prepare_model_for_kbit_training(model)
 
+    # Explicitly ensure all non-quantized modules (embed_tokens, lm_head, layernorms) are float32
+    # so NO bfloat16 tensors exist anywhere in the model
+    for name, module in model.named_modules():
+        if hasattr(module, "weight") and module.weight is not None:
+            if not hasattr(module, "quant_state"):
+                if module.weight.dtype == torch.bfloat16:
+                    module.to(torch.float32)
+
     lora_config = LoraConfig(
         r=args.lora_r,
         lora_alpha=args.lora_alpha,
         lora_dropout=args.lora_dropout,
         bias="none",
         task_type=TaskType.CAUSAL_LM,
-        target_modules="all-linear"
+        target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
     )
     model = get_peft_model(model, lora_config)
 
@@ -281,6 +289,10 @@ def main():
     for name, param in model.named_parameters():
         if param.requires_grad:
             param.data = param.data.to(torch.float32)
+
+    trainable_dtypes = set(p.dtype for p in model.parameters() if p.requires_grad)
+    print(f"Trainable parameter dtypes: {trainable_dtypes}")
+    assert torch.bfloat16 not in trainable_dtypes, f"Found BFloat16 in trainable parameters: {trainable_dtypes}"
 
     model.print_trainable_parameters()
 
