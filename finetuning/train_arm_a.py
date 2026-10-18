@@ -116,7 +116,7 @@ def main():
         from datasets import Dataset
         from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig, set_seed
         from transformers.trainer_utils import get_last_checkpoint
-        from peft import LoraConfig, get_peft_model, TaskType
+        from peft import LoraConfig, get_peft_model, TaskType, prepare_model_for_kbit_training
         from trl import SFTTrainer, SFTConfig
     except ImportError as e:
         print(f"ERROR: Missing training dependencies: {e}")
@@ -254,13 +254,18 @@ def main():
     )
 
     print("Loading base model in 4-bit...")
+    target_dtype = COMPUTE_DTYPE if cuda_available else torch.float32
     model = AutoModelForCausalLM.from_pretrained(
         model_id,
         quantization_config=bnb_config if cuda_available else None,
         device_map="auto" if cuda_available else None,
-        torch_dtype=COMPUTE_DTYPE if cuda_available else torch.float32
+        dtype=target_dtype,
+        torch_dtype=target_dtype
     )
     model.config.use_cache = False
+
+    if cuda_available:
+        model = prepare_model_for_kbit_training(model)
 
     lora_config = LoraConfig(
         r=args.lora_r,
@@ -271,6 +276,12 @@ def main():
         target_modules="all-linear"
     )
     model = get_peft_model(model, lora_config)
+
+    # Ensure all trainable LoRA parameters are float32 so fp16 GradScaler never encounters BFloat16 gradients
+    for name, param in model.named_parameters():
+        if param.requires_grad:
+            param.data = param.data.to(torch.float32)
+
     model.print_trainable_parameters()
 
     # 10. Check for Existing Checkpoint to Support Resumption ONLY when explicitly flagged
