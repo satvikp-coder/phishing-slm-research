@@ -46,6 +46,9 @@ Dates are approximate (file timestamps / chat order). Calendar dates of student 
 Project A, B (not pursued). Separate Nazario/Enron/CEAS raw downloads (replaced by HF corpus). Nazario corpus: NOT used (must be stated in paper). Header-feature ablation: optional, undecided. Modern 2023–26 phishing sample (to reduce era drift): suggested, not done.
 
 ## Supervisor information
-- Direct instruction/feedback: **only** acceptance of Project C [U]. No requirements, deadlines, or feedback otherwise.
-- Claude's own suggestions (NOT supervisor's): everything else, incl. 12-week plan, metrics, ablations, baselines-first.
+- Direct instruction/feedback:
+  - 2026-08-21: Acceptance of Project C [U].
+  - 2026-10-18: Prof. Amit Das (AMSOM) reviewed the Week 3 & 4 baseline report, noted that classical algorithms (TF-IDF+LogReg, TF-IDF+SVM) performed very well on F1 and AUROC, and explicitly instructed: *"Please proceed to your next task: Arm A Fine-Tuning: Naive QLoRA on Qwen2.5-1.5B (Direct Classification)"*.
+- Claude's own suggestions (NOT supervisor's): 12-week plan, metrics, ablations, baselines-first ordering.
 - Student requirements: low compute; paper-oriented; GitHub kept in sync with each validated step; Colab for GPU work; wants simple-language status text for supervisor.
+

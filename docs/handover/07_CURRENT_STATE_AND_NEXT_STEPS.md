@@ -4,18 +4,15 @@
 > **Weeks 1–4 are 100% completed and audited.** Data splits verified, Classical Baselines (LR F1=0.9687, SVM F1=0.9646) executed, and Zero-Shot SLM & LLM baselines (Qwen-1.5B F1=0.5811, Groq-27B F1=0.3312) logged in `eval/results/baseline_results.csv`. We are currently at **Week 5 & 6 (The Fine-Tuning Experiment)**.
 
 ## State
-- **Completed:** W1 (lit, RQ, repo); W2 (dataset, locked test). [R][U]
-- **Partially:** W5/W6 — infra validated on placeholders only. W3 — notebook rebuilt, unrun.
-- **In progress at handover:** student had asked for status reports for the supervisor; Claude had just written the Week 3 notebook and had not delivered it.
-- **Planned:** W4, W7–W12 (see `01`).
-- **Blocked / needs input:** deadline; whether repo pushed; Drive file verification; API provider/budget; teacher-model choice.
-- **Needs verification:** everything tagged [?]; Drive CSVs/adapters; label semantics; HF dataset revision.
-- **Abandoned:** Projects A/B; Nazario; separate raw downloads.
+- **Completed:** W1 (lit, RQ, repo); W2 (dataset, locked test); W3 (classical baselines: LR F1=0.9687, SVM F1=0.9646); W4 (zero-shot baselines: Qwen-1.5B F1=0.5811, Groq-27B F1=0.3312).
+- **In Progress (Active Task):** Week 5 — Arm A: Naive QLoRA on Qwen2.5-1.5B (Direct Classification) per supervisor directive from Prof. Amit Das (AMSOM, 2026-10-18).
+- **Planned:** W6 (CoT-distilled LoRA), W7 (adversarial set), W8 (main test eval), W9–W12.
+- **Constraints Maintained:** `phishing_test.csv` strictly locked. No CoT generated or used for Arm A. Run metadata and per-example predictions logged.
 
 ## EXACT RESUMPTION POINT
-1. Student request (last substantive research task): "do which is best" re: ordering ⇒ Claude chose **Week 3 → Week 4 before real fine-tuning**.
-2. Claude had done: built Week 3 notebook (never exported). 3. Files: `baselines/Week3_Classical_Baseline.ipynb` (rebuilt). 4. Outputs: none executed. 5. Unfinished: run it; Week 4. 6. No active bug. 7. Assumption: CSV splits exist on Drive as documented.
-8. **Immediate next action:** (a) execute `09` verification; (b) get the splits locally or run on Colab; (c) run Week 3 notebook (train/val only) and save `eval/results/baseline_results.csv`. 9. **Verify success:** 2 rows (`TF-IDF + LogisticRegression`, `TF-IDF + LinearSVM`, split=val) with finite metrics; best CV params printed; test file untouched (check no code path references `phishing_test.csv`). 10. **After:** commit "Week 3: classical baseline (val)", then Week 4.
+1. **Supervisor Instruction (2026-10-18):** Prof. Amit Das reviewed Week 3 report, noted classical baselines did very well in F1 and AUROC, and approved proceeding to: *"Arm A Fine-Tuning: Naive QLoRA on Qwen2.5-1.5B (Direct Classification)"*.
+2. **Current Step:** STEP 1 (Fix all hazards from 06 in fine-tuning code, ensure pre-format truncation, completion-only loss masking, fp16 on T4, shared prompt template, and wait for user's "go" before full run).
+
 
 ## Roadmap (agreed plan = 12-week guide; Codex additions marked ★ = proposals)
 | Phase | Objective / tasks | Inputs → outputs | Done when | Risk |

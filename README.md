@@ -98,7 +98,7 @@ Unified from 6 benchmark corpora (`Enron`, `CEAS-08`, `SpamAssassin`, `TREC-05`,
 - [x] **Week 2:** Multi-corpus acquisition, MD5 deduplication, and stratified 70/10/20 train/val/test splitting.
 - [x] **Week 3:** Classical ML baselines established ($F_1 = 0.9687$, 3-fold cross-validated).
 - [x] **Week 4:** Zero-shot SLM & LLM baselines established ($F_1 = 0.5811$ for 1.5B, $F_1 = 0.3312$ for 27B).
-- [ ] **Week 5:** Arm A Fine-Tuning: Naive QLoRA on `Qwen2.5-1.5B-Instruct` (Direct Labeling).
+- [ ] **Week 5:** Arm A Fine-Tuning: Naive QLoRA on `Qwen2.5-1.5B-Instruct` (Direct Labeling) — *IN PROGRESS* (Supervisor approved 2026-10-18).
 - [ ] **Week 6:** Arm B Fine-Tuning: Reasoning-Distilled QLoRA on `Qwen2.5-1.5B-Instruct` (Chain-of-Thought).
 - [ ] **Week 7:** Adversarial & AI-rephrased phishing test set construction.
 - [ ] **Week 8:** Final evaluation across locked test set and adversarial test sets.
