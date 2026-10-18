@@ -2,4 +2,4 @@ model,split,accuracy,precision,recall,f1,auroc,false_positive_rate,fit_time_sec,
 TF-IDF + LogisticRegression,val,0.9736,0.9703,0.9671,0.9687,0.9963,0.0217,220.49,0.43,0.0
 TF-IDF + LinearSVM,val,0.9702,0.9677,0.9615,0.9646,0.9960,0.0234,217.19,0.51,0.0
 Qwen2.5-1.5B-Instruct (Zero-Shot),val,0.6364,0.5661,0.5970,0.5811,,0.3347,0.0,432.53,0.0
-Groq-qwen/qwen3.8-27b (Zero-Shot),val (n=1850),0.3254,0.2864,0.3926,0.3312,,0.7244,0.0,38.12,0.0
+
