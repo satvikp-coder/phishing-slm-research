@@ -1,6 +1,6 @@
 # src/prompt_template.py — Unified Prompt Formatting for Training and Evaluation
 import pandas as pd
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Dict
 
 MAX_BODY_TOKENS = 800
 RESPONSE_TEMPLATE = "### Response:\n"
@@ -22,23 +22,20 @@ def truncate_body_text(body: str, max_tokens: int = MAX_BODY_TOKENS, tokenizer =
         return body, False
     else:
         # Approximate 1 token ~= 0.75 words (or ~1.3 tokens per word)
-        # 800 tokens ~= 600 words
         words = body.split()
         max_words = int(max_tokens * 0.75)
         if len(words) > max_words:
             return " ".join(words[:max_words]), True
         return body, False
 
-def build_naive_prompt(subject: str, body: str, label: Optional[str] = None) -> str:
+def build_naive_prompt(subject: str, body: str) -> str:
     """
-    Constructs the standardized prompt for Arm A (Naive direct classification).
-    For training: supply label ('Phishing' or 'Legitimate').
-    For evaluation / inference: omit label to prompt the model up to '### Response:\n'.
+    Constructs the prompt up to '### Response:\n' (used for evaluation & as 'prompt' column).
     """
     subject_str = str(subject) if pd.notna(subject) else ""
     body_str = str(body) if pd.notna(body) else ""
 
-    prompt = (
+    return (
         f"### Instruction:\n"
         f"Classify the following email as 'Phishing' or 'Legitimate'.\n\n"
         f"### Email:\n"
@@ -46,6 +43,13 @@ def build_naive_prompt(subject: str, body: str, label: Optional[str] = None) -> 
         f"Body:\n{body_str}\n\n"
         f"### Response:\n"
     )
-    if label:
-        prompt += f"{label}"
-    return prompt
+
+def build_prompt_completion_pair(subject: str, body: str, label: int) -> Dict[str, str]:
+    """
+    Constructs standard {'prompt': ..., 'completion': ...} dictionary for TRL prompt-completion SFT.
+    """
+    label_str = "Phishing" if label == 1 else "Legitimate"
+    return {
+        "prompt": build_naive_prompt(subject, body),
+        "completion": f" {label_str}"
+    }

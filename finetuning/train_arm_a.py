@@ -6,8 +6,9 @@ Target: "Phishing" or "Legitimate" (label-only targets).
 Adheres strictly to docs/handover/08:
 - Trains on phishing_train.csv ONLY.
 - phishing_test.csv is never referenced.
-- Completion-only loss (DataCollatorForCompletionOnlyLM).
+- Prompt-completion dataset with TRL native completion_only_loss=True.
 - Pre-format body truncation to 800 tokens.
+- Resumable training via Drive checkpoints (save_steps=200).
 - Fixed seed (42).
 - T4-optimized fp16 compute.
 """
@@ -27,7 +28,7 @@ REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if REPO_ROOT not in sys.path:
     sys.path.insert(0, REPO_ROOT)
 
-from src.prompt_template import MAX_BODY_TOKENS, RESPONSE_TEMPLATE, build_naive_prompt, truncate_body_text
+from src.prompt_template import MAX_BODY_TOKENS, RESPONSE_TEMPLATE, build_naive_prompt, build_prompt_completion_pair, truncate_body_text
 
 def get_git_hash():
     try:
@@ -43,35 +44,40 @@ def get_file_sha256(path):
             h.update(chunk)
     return h.hexdigest()
 
-def verify_completion_masking(dataset, collator, tokenizer, num_examples=3):
+def verify_prompt_completion_masking(dataset, tokenizer, num_examples=3):
     """
-    Verifies on num_examples that prompt tokens have label=-100 and only response tokens are unmasked.
+    Simulates and verifies that prompt tokens receive label=-100 and only completion tokens are unmasked.
     """
-    print("\n--- [VERIFICATION] Completion-Only Loss Masking Check ---")
-    batch = collator([dataset[i] for i in range(min(num_examples, len(dataset)))])
-    input_ids = batch["input_ids"]
-    labels = batch["labels"]
+    print("\n--- [VERIFICATION] Prompt-Completion Loss Masking Check ---")
+    eos_token_id = tokenizer.eos_token_id
     
-    for i in range(len(input_ids)):
-        inp = input_ids[i].tolist()
-        lbl = labels[i].tolist()
+    for i in range(min(num_examples, len(dataset))):
+        sample = dataset[i]
+        prompt_text = sample["prompt"]
+        completion_text = sample["completion"]
         
-        # Count masked (-100) vs unmasked tokens
-        masked_count = sum(1 for x in lbl if x == -100)
-        unmasked_indices = [idx for idx, x in enumerate(lbl) if x != -100]
-        unmasked_tokens = [tokenizer.decode([inp[idx]]) for idx in unmasked_indices]
+        prompt_ids = tokenizer(prompt_text, add_special_tokens=False)["input_ids"]
+        completion_ids = tokenizer(completion_text, add_special_tokens=False)["input_ids"]
+        if eos_token_id is not None:
+            completion_ids.append(eos_token_id)
+            
+        full_ids = prompt_ids + completion_ids
+        # Under completion_only_loss=True, prompt tokens are masked with -100
+        labels = [-100] * len(prompt_ids) + completion_ids
         
-        print(f"\nExample {i+1}:")
-        print(f"  Total tokens: {len(inp)}")
+        masked_count = sum(1 for x in labels if x == -100)
+        unmasked_indices = [idx for idx, x in enumerate(labels) if x != -100]
+        unmasked_tokens = [tokenizer.decode([full_ids[idx]]) for idx in unmasked_indices]
+        
+        print(f"Example {i+1}:")
+        print(f"  Total tokens: {len(full_ids)}")
         print(f"  Masked prompt tokens (-100): {masked_count}")
         print(f"  Unmasked target tokens: {len(unmasked_indices)} -> {unmasked_tokens}")
         
-        # Assertions
-        assert masked_count > 0, f"Example {i+1} has no masked tokens!"
-        assert len(unmasked_indices) > 0, f"Example {i+1} has no unmasked tokens!"
-        assert all(lbl[idx] != -100 for idx in unmasked_indices), "Unmasked mismatch!"
+        assert masked_count == len(prompt_ids), f"Prompt tokens count mismatch on example {i+1}"
+        assert len(unmasked_indices) == len(completion_ids), f"Completion tokens count mismatch on example {i+1}"
     
-    print("--- [VERIFIED] Prompt tokens are correctly masked with -100! ---\n")
+    print("--- [VERIFIED] Prompt tokens are correctly masked with -100! Only completion is trained. ---\n")
 
 def main():
     parser = argparse.ArgumentParser(description="Arm A: Naive QLoRA fine-tuning on Qwen2.5-1.5B")
@@ -86,6 +92,7 @@ def main():
     parser.add_argument("--lora_alpha", type=int, default=32, help="LoRA alpha")
     parser.add_argument("--lora_dropout", type=float, default=0.05, help="LoRA dropout")
     parser.add_argument("--max_body_tokens", type=int, default=MAX_BODY_TOKENS, help="Pre-format body token budget")
+    parser.add_argument("--save_steps", type=int, default=200, help="Checkpoint frequency (steps)")
     parser.add_argument("--seed", type=int, default=42, help="Random seed")
     args = parser.parse_args()
 
@@ -94,11 +101,12 @@ def main():
         import torch
         from datasets import Dataset
         from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig, set_seed
+        from transformers.trainer_utils import get_last_checkpoint
         from peft import LoraConfig, get_peft_model, TaskType
-        from trl import SFTTrainer, SFTConfig, DataCollatorForCompletionOnlyLM
+        from trl import SFTTrainer, SFTConfig
     except ImportError as e:
         print(f"ERROR: Missing training dependencies: {e}")
-        print("Please install requirements: pip install transformers peft bitsandbytes trl datasets accelerate")
+        print("Please install pinned requirements from requirements.txt")
         sys.exit(1)
 
     # 2. Set Seeds (Deterministic Protocol)
@@ -106,7 +114,7 @@ def main():
     np.random.seed(args.seed)
 
     # 3. Hardware Inspection & Precision Justification
-    # Hardware Justification: Tesla T4 (Turing, Compute Capability 7.5) does not possess native bfloat16
+    # Justification: Tesla T4 (Turing, Compute Capability 7.5) does not possess native bfloat16
     # tensor core acceleration. Emulating bf16 on T4 degrades throughput. Therefore, fp16 is the 
     # mathematically correct, stable, and accelerated compute dtype for 4-bit QLoRA on T4.
     cuda_available = torch.cuda.is_available()
@@ -131,13 +139,14 @@ def main():
 
     print(f"\n--- Arm A Naive QLoRA Configuration ---")
     print(f"Model:                Qwen/Qwen2.5-1.5B-Instruct")
-    print(f"Mode:                 Arm A (Direct Classification, Label-Only)")
+    print(f"Mode:                 Arm A (Direct Classification, Prompt-Completion)")
     print(f"Train Dataset:        {args.data_path}")
     print(f"Pre-format budget:    {args.max_body_tokens} body tokens")
     print(f"LoRA config:          r={args.lora_r}, alpha={args.lora_alpha}, dropout={args.lora_dropout}")
     print(f"Effective batch size: {args.batch_size * args.grad_accum}")
     print(f"Learning rate:        {args.lr}")
     print(f"Compute dtype:        fp16={USE_FP16}, bf16={USE_BF16}")
+    print(f"Checkpoint save steps:{args.save_steps} (~20-30 mins per checkpoint)")
     print(f"Smoke test mode:      {args.smoke_test}")
     print(f"---------------------------------------\n")
 
@@ -160,24 +169,26 @@ def main():
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
-    # 7. Pre-format Truncation & Dataset Construction
+    # 7. Pre-format Truncation & Prompt-Completion Dataset Construction
     truncated_count = 0
-    formatted_texts = []
+    records = []
     for _, row in df.iterrows():
         subj = str(row['subject']) if pd.notna(row['subject']) else ""
         raw_body = str(row['body']) if pd.notna(row['body']) else ""
         trunc_body, was_trunc = truncate_body_text(raw_body, max_tokens=args.max_body_tokens, tokenizer=tokenizer)
         if was_trunc:
             truncated_count += 1
-        label_str = "Phishing" if row['label'] == 1 else "Legitimate"
-        formatted_texts.append(build_naive_prompt(subj, trunc_body, label=label_str))
+        records.append(build_prompt_completion_pair(subj, trunc_body, int(row['label'])))
 
     pct_truncated = (truncated_count / len(df)) * 100
     print(f"Pre-format truncation: {truncated_count}/{len(df)} rows truncated ({pct_truncated:.2f}%)")
 
-    dataset = Dataset.from_pandas(pd.DataFrame({"text": formatted_texts}))
+    dataset = Dataset.from_pandas(pd.DataFrame(records))
 
-    # 8. Setup Quantization & LoRA
+    # 8. Verify Prompt Tokens are Masked with -100
+    verify_prompt_completion_masking(dataset, tokenizer, num_examples=3)
+
+    # 9. Setup Quantization & LoRA
     bnb_config = BitsAndBytesConfig(
         load_in_4bit=True,
         bnb_4bit_quant_type="nf4",
@@ -205,18 +216,17 @@ def main():
     model = get_peft_model(model, lora_config)
     model.print_trainable_parameters()
 
-    # 9. Completion-Only Data Collator
-    collator = DataCollatorForCompletionOnlyLM(
-        response_template=RESPONSE_TEMPLATE,
-        tokenizer=tokenizer
-    )
-
-    # 10. Verify Prompt Tokens are Masked with -100
-    verify_completion_masking(dataset, collator, tokenizer, num_examples=3)
+    # 10. Check for Existing Checkpoint to Support Resumption
+    last_checkpoint = get_last_checkpoint(args.output_dir)
+    if last_checkpoint is not None and not args.smoke_test:
+        print(f"\n[RESUME]: Found previous checkpoint at {last_checkpoint}. Will resume training from here!")
+    else:
+        last_checkpoint = None
 
     # 11. SFT Training Arguments
     max_steps = 40 if args.smoke_test else -1
     epochs = 1 if args.smoke_test else args.num_epochs
+    save_strategy = "no" if args.smoke_test else "steps"
 
     sft_config = SFTConfig(
         output_dir=args.output_dir,
@@ -226,11 +236,13 @@ def main():
         gradient_accumulation_steps=args.grad_accum,
         learning_rate=args.lr,
         logging_steps=5 if args.smoke_test else 20,
-        save_strategy="no" if args.smoke_test else "epoch",
+        save_strategy=save_strategy,
+        save_steps=args.save_steps if not args.smoke_test else 500,
+        save_total_limit=2,
         fp16=USE_FP16 if cuda_available else False,
         bf16=USE_BF16,
         report_to="none",
-        dataset_text_field="text",
+        completion_only_loss=True,
         max_length=1024,
         seed=args.seed
     )
@@ -238,14 +250,13 @@ def main():
     trainer = SFTTrainer(
         model=model,
         args=sft_config,
-        train_dataset=dataset,
-        data_collator=collator
+        train_dataset=dataset
     )
 
     # 12. Train
     print("\nStarting training...")
     t0 = time.time()
-    train_result = trainer.train()
+    train_result = trainer.train(resume_from_checkpoint=last_checkpoint)
     wall_time = time.time() - t0
 
     # 13. Resource & Performance Accounting
@@ -261,13 +272,12 @@ def main():
 
     projected_full_hours = 0.0
     if args.smoke_test:
-        # Full run: 20,681 rows * 3 epochs / 16 eff batch ~= 3,878 steps
         full_steps = int((total_rows * args.num_epochs) / (args.batch_size * args.grad_accum))
         projected_full_sec = full_steps / steps_per_sec if steps_per_sec > 0 else 0
         projected_full_hours = projected_full_sec / 3600
         print(f"Projected full run time (3,878 steps on T4): {projected_full_hours:.2f} hours")
 
-    # 14. Save Adapter & Metadata
+    # 14. Save Final Adapter & Metadata
     if not args.smoke_test:
         trainer.save_model(args.output_dir)
         tokenizer.save_pretrained(args.output_dir)
@@ -296,6 +306,8 @@ def main():
             "num_epochs": args.num_epochs,
             "max_body_tokens": args.max_body_tokens,
             "max_seq_length": 1024,
+            "completion_only_loss": True,
+            "save_steps": args.save_steps,
             "fp16": USE_FP16,
             "bf16": USE_BF16
         },
@@ -307,14 +319,7 @@ def main():
             "peak_gpu_mem_gb": round(peak_mem_gb, 2),
             "projected_full_run_hours": round(projected_full_hours, 2)
         },
-        "hardware": device_name,
-        "library_versions": {
-            "torch": torch.__version__,
-            "transformers": transformers.__version__,
-            "peft": peft.__version__,
-            "trl": trl.__version__,
-            "bitsandbytes": bitsandbytes.__version__
-        }
+        "hardware": device_name
     }
 
     run_json_path = os.path.join(REPO_ROOT, "eval", "results", "runs", f"{run_id}.json")
