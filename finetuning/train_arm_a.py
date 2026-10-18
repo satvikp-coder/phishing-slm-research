@@ -327,8 +327,8 @@ def main():
         "save_strategy": save_strategy,
         "save_steps": args.save_steps if not args.smoke_test else 500,
         "save_total_limit": 2,
-        "fp16": USE_FP16 if cuda_available else False,
-        "bf16": USE_BF16,
+        "fp16": False,  # QLoRA uses bnb_4bit_compute_dtype=float16 internally; disabling global fp16 prevents PyTorch GradScaler BFloat16 crash
+        "bf16": False,
         "report_to": "none",
         "seed": args.seed
     }
