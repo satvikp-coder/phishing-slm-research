@@ -18,5 +18,8 @@ The zero-shot run on Groq (`qwen/qwen3.8-27b`) on an incomplete validation slice
    - **(a) Unparseable excluded and counted separately**
    - **(b) Unparseable counted as wrong (sanitized)**
 
-## Audit Script
-Run `python eval/audit_groq_outputs.py` against the cached responses to generate the full 20-example raw output audit (10 FP, 10 FN) and dual confusion matrices.
+## Audit Script & Retrospective Limitation
+- `eval/audit_groq_outputs.py` was written to parse per-email raw cache JSONs if available.
+- **Important Audit Finding:** During the original Colab run, per-email raw completion JSONs were **never saved or preserved** (only the parsed `email_id` and `y_pred` in `preds_groq_qwen_qwen3_8-27b_val.csv` were saved to Drive).
+- Consequently, this specific $n=1,850$ row **cannot be retrospectively audited without a complete re-run**, which is currently **low priority** compared to the primary Arm A fine-tuning research objective. It remains strictly quarantined.
+

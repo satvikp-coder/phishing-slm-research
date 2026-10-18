@@ -31,12 +31,15 @@ if REPO_ROOT not in sys.path:
 
 from src.prompt_template import (
     MAX_BODY_TOKENS,
+    MAX_SUBJECT_TOKENS,
+    MAX_SEQ_LENGTH,
     RESPONSE_TEMPLATE,
     COMPLETION_PHISHING,
     COMPLETION_LEGITIMATE,
     build_naive_prompt,
     build_prompt_completion_pair,
-    truncate_body_text
+    truncate_body_text,
+    truncate_subject_text
 )
 
 def get_git_hash():
@@ -90,6 +93,7 @@ def verify_prompt_completion_masking(dataset, tokenizer, num_examples=3):
 def main():
     parser = argparse.ArgumentParser(description="Arm A: Naive QLoRA fine-tuning on Qwen2.5-1.5B")
     parser.add_argument("--smoke_test", action="store_true", help="Run smoke test on 200 rows (~30-50 steps)")
+    parser.add_argument("--resume", action="store_true", help="Explicitly resume from last checkpoint in output_dir")
     parser.add_argument("--data_path", type=str, default=None, help="Path to phishing_train.csv")
     parser.add_argument("--val_path", type=str, default=None, help="Path to phishing_val.csv")
     parser.add_argument("--output_dir", type=str, default=None, help="Directory to save adapter")
@@ -100,6 +104,7 @@ def main():
     parser.add_argument("--lora_r", type=int, default=16, help="LoRA rank")
     parser.add_argument("--lora_alpha", type=int, default=32, help="LoRA alpha")
     parser.add_argument("--lora_dropout", type=float, default=0.05, help="LoRA dropout")
+    parser.add_argument("--max_subject_tokens", type=int, default=MAX_SUBJECT_TOKENS, help="Pre-format subject token budget")
     parser.add_argument("--max_body_tokens", type=int, default=MAX_BODY_TOKENS, help="Pre-format body token budget")
     parser.add_argument("--save_steps", type=int, default=200, help="Checkpoint frequency (steps)")
     parser.add_argument("--seed", type=int, default=42, help="Random seed")
@@ -140,7 +145,8 @@ def main():
         args.val_path = os.path.join(REPO_ROOT, "data", "processed", "phishing_val.csv")
     
     if args.output_dir is None:
-        args.output_dir = os.path.join(REPO_ROOT, "finetuning", "checkpoints", "Qwen2.5-1.5B-Instruct-naive")
+        suffix = "Qwen2.5-1.5B-Instruct-naive-SMOKE" if args.smoke_test else "Qwen2.5-1.5B-Instruct-naive"
+        args.output_dir = os.path.join(REPO_ROOT, "finetuning", "checkpoints", suffix)
     
     os.makedirs(args.output_dir, exist_ok=True)
     os.makedirs(os.path.join(REPO_ROOT, "eval", "results", "runs"), exist_ok=True)
@@ -165,13 +171,15 @@ def main():
     print(f"Mode:                 Arm A (Direct Classification, Prompt-Completion)")
     print(f"Train Dataset:        {args.data_path} (Rows: {len(train_df)}, SHA256: {train_sha256})")
     print(f"Val Dataset:          {args.val_path} (Rows: {len(val_df)}, SHA256: {val_sha256})")
-    print(f"Pre-format budget:    {args.max_body_tokens} body tokens")
+    print(f"Pre-format budget:    {args.max_subject_tokens} subject tokens | {args.max_body_tokens} body tokens")
+    print(f"Max sequence length:  1024 tokens (explicitly enforced)")
     print(f"LoRA config:          r={args.lora_r}, alpha={args.lora_alpha}, dropout={args.lora_dropout}")
     print(f"Effective batch size: {args.batch_size * args.grad_accum}")
     print(f"Learning rate:        {args.lr}")
     print(f"Compute dtype:        fp16={USE_FP16}, bf16={USE_BF16}")
     print(f"Checkpoint save steps:{args.save_steps} (~20-30 mins per checkpoint)")
     print(f"Smoke test mode:      {args.smoke_test}")
+    print(f"Output directory:     {args.output_dir}")
     print(f"---------------------------------------\n")
 
     df = train_df
@@ -195,18 +203,43 @@ def main():
     assert ids_p[0] != ids_l[0], "First tokens must be distinct!"
 
     # 7. Pre-format Truncation & Dataset Construction
-    truncated_count = 0
+    body_truncated_count = 0
+    subject_truncated_count = 0
     records = []
-    for _, row in df.iterrows():
-        subj = str(row['subject']) if pd.notna(row['subject']) else ""
-        raw_body = str(row['body']) if pd.notna(row['body']) else ""
-        trunc_body, was_trunc = truncate_body_text(raw_body, max_tokens=args.max_body_tokens, tokenizer=tokenizer)
-        if was_trunc:
-            truncated_count += 1
-        records.append(build_prompt_completion_pair(subj, trunc_body, int(row['label'])))
+    total_tokens_list = []
+    eos_token = tokenizer.eos_token
 
-    pct_truncated = (truncated_count / len(df)) * 100
-    print(f"Pre-format truncation: {truncated_count}/{len(df)} rows truncated ({pct_truncated:.2f}%)")
+    for _, row in df.iterrows():
+        s_trunc, s_was_trunc = truncate_subject_text(row['subject'], max_tokens=args.max_subject_tokens, tokenizer=tokenizer)
+        b_trunc, b_was_trunc = truncate_body_text(row['body'], max_tokens=args.max_body_tokens, tokenizer=tokenizer)
+        if s_was_trunc:
+            subject_truncated_count += 1
+        if b_was_trunc:
+            body_truncated_count += 1
+            
+        pair = build_prompt_completion_pair(s_trunc, b_trunc, int(row['label']), tokenizer=None)
+        records.append(pair)
+        
+        full_seq = pair["prompt"] + pair["completion"] + eos_token
+        tok_len = len(tokenizer.encode(full_seq, add_special_tokens=False))
+        total_tokens_list.append(tok_len)
+
+    arr = np.array(total_tokens_list)
+    rows_exceeding = int((arr > 1024).sum())
+    max_observed = int(np.max(arr))
+
+    print(f"\n--- Sequence Length Audit (Target max_length: 1024) ---")
+    print(f"Dataset Rows:            {len(df)}")
+    print(f"Min Tokens:              {int(np.min(arr))}")
+    print(f"p50 (Median) Tokens:     {float(np.median(arr)):.1f}")
+    print(f"p90 Tokens:              {float(np.percentile(arr, 90)):.1f}")
+    print(f"p99 Tokens:              {float(np.percentile(arr, 99)):.1f}")
+    print(f"Max Tokens:              {max_observed}")
+    print(f"Rows > 1024:             {rows_exceeding} (Must strictly be 0)")
+    print(f"Bodies Truncated:        {body_truncated_count} ({body_truncated_count / len(df) * 100:.2f}%)")
+    print(f"Subjects Truncated:      {subject_truncated_count} ({subject_truncated_count / len(df) * 100:.2f}%)")
+
+    assert rows_exceeding == 0, f"CRITICAL: {rows_exceeding} sequences exceed max_length 1024! Max was {max_observed}."
     dataset = Dataset.from_pandas(pd.DataFrame(records))
 
     # 8. Verify Prompt Tokens are Masked with -100
@@ -240,12 +273,17 @@ def main():
     model = get_peft_model(model, lora_config)
     model.print_trainable_parameters()
 
-    # 10. Check for Existing Checkpoint to Support Resumption
-    last_checkpoint = get_last_checkpoint(args.output_dir)
-    if last_checkpoint is not None and not args.smoke_test:
-        print(f"\n[RESUME]: Found previous checkpoint at {last_checkpoint}. Resuming training!")
+    # 10. Check for Existing Checkpoint to Support Resumption ONLY when explicitly flagged
+    last_checkpoint = None
+    if args.resume and not args.smoke_test:
+        last_checkpoint = get_last_checkpoint(args.output_dir)
+        if last_checkpoint is not None:
+            print(f"\n[RESUME]: Found previous checkpoint at {last_checkpoint}. Resuming training!")
+        else:
+            print(f"\n[RESUME]: --resume flag was set, but no checkpoint was found at {args.output_dir}. Starting from scratch.")
     else:
-        last_checkpoint = None
+        if not args.smoke_test:
+            print("\n[TRAIN]: Clean run starting from scratch (--resume flag not set).")
 
     # 11. SFT Training Arguments (Adaptive Signature Handling)
     max_steps = 40 if args.smoke_test else -1

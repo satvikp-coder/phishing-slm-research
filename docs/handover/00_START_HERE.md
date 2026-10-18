@@ -12,9 +12,12 @@
 ## Project identity
 - **Working title:** "Small but Sufficient? A Cost–Performance–Robustness Comparison of Fine-Tuned Small Language Models and Proprietary LLM APIs for Phishing-Email Detection Under Adversarial (LLM-Generated) Phishing" [R: README, docs]
 - **Repo:** `phishing-slm-research` (git, branch `main`). GitHub URL / whether pushed: [?]
-- **Institution / department / supervisor name / start date / hard deadline:** [?] — never provided. Student calls supervisor "sir".
+- **Supervisor:** Prof. Amit Das (AMSOM).
+- **Institution / Department:** Inferred as Ahmedabad University, Amrut Mody School of Management (AMSOM, from the `.ahduni.edu.in` student email domain in git metadata and supervisor signature "Amit Das, AMSOM"); marked as [inferred, confirm].
 - **Student constraints (stated at project start):** ~12-week plan, 1 student, LOW compute (inference, small open models, QLoRA, APIs; no pretraining), goal = research paper with quantitative evaluation. Compute actually used so far: Google Colab free-tier Tesla T4 [U].
-- **Supervisor input received:** only that the supervisor **accepted "Project 3" (= Project C, this project)** out of 3 candidates presented [U, one sentence]. No other feedback recorded.
+- **Supervisor input received:**
+  - Accepted "Project 3" (= Project C, this project) out of 3 candidates presented [U, one sentence].
+  - 2026-10-18: Reviewed Week 3 & 4 report, noted classical baselines (TF-IDF+LogReg, TF-IDF+SVM) performed very well on F1 and AUROC, and directed: *"Please proceed to your next task: Arm A Fine-Tuning: Naive QLoRA on Qwen2.5-1.5B (Direct Classification)"*.
 
 ## One-paragraph science summary
 Compare ≤3B-parameter open SLMs (fine-tuned with QLoRA two ways: **naive label-only** vs **CoT/reasoning-trace-distilled**) against zero-shot SLMs, a proprietary LLM API, and a TF-IDF classical baseline on phishing-email classification, on (a) an in-distribution locked test set and (b) a self-built set of LLM-generated phishing emails. Core contribution (narrowed after novelty check): **the controlled naive-vs-CoT fine-tuning comparison and its robustness under LLM-generated phishing.** "LLM-rephrased phishing degrades detectors" is NOT novel (arXiv:2507.07406, 2411.13874, 2510.11915). Hypothesis H1 may be false; a null result is an acceptable, planned outcome.

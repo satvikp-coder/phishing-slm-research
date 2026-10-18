@@ -46,6 +46,8 @@ Dates are approximate (file timestamps / chat order). Calendar dates of student 
 Project A, B (not pursued). Separate Nazario/Enron/CEAS raw downloads (replaced by HF corpus). Nazario corpus: NOT used (must be stated in paper). Header-feature ablation: optional, undecided. Modern 2023–26 phishing sample (to reduce era drift): suggested, not done.
 
 ## Supervisor information
+- Supervisor: Prof. Amit Das (AMSOM).
+- Institution / Department: Inferred as Ahmedabad University, Amrut Mody School of Management (AMSOM, from the student's email domain `@ahduni.edu.in` in git metadata and supervisor signature "Amit Das, AMSOM"); marked as [inferred, confirm].
 - Direct instruction/feedback:
   - 2026-08-21: Acceptance of Project C [U].
   - 2026-10-18: Prof. Amit Das (AMSOM) reviewed the Week 3 & 4 baseline report, noted that classical algorithms (TF-IDF+LogReg, TF-IDF+SVM) performed very well on F1 and AUROC, and explicitly instructed: *"Please proceed to your next task: Arm A Fine-Tuning: Naive QLoRA on Qwen2.5-1.5B (Direct Classification)"*.
