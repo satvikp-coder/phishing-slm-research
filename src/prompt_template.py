@@ -5,6 +5,11 @@ from typing import Optional, Tuple, Dict
 MAX_BODY_TOKENS = 800
 RESPONSE_TEMPLATE = "### Response:\n"
 
+# Canonical completion strings — strictly NO leading space, matching prompt template ending with \n
+COMPLETION_PHISHING = "Phishing"
+COMPLETION_LEGITIMATE = "Legitimate"
+LABEL_TO_COMPLETION = {1: COMPLETION_PHISHING, 0: COMPLETION_LEGITIMATE}
+
 def truncate_body_text(body: str, max_tokens: int = MAX_BODY_TOKENS, tokenizer = None) -> Tuple[str, bool]:
     """
     Truncates email body text to a fixed token budget BEFORE formatting.
@@ -47,9 +52,10 @@ def build_naive_prompt(subject: str, body: str) -> str:
 def build_prompt_completion_pair(subject: str, body: str, label: int) -> Dict[str, str]:
     """
     Constructs standard {'prompt': ..., 'completion': ...} dictionary for TRL prompt-completion SFT.
+    Completion string has NO leading space.
     """
-    label_str = "Phishing" if label == 1 else "Legitimate"
+    label_str = LABEL_TO_COMPLETION[int(label)]
     return {
         "prompt": build_naive_prompt(subject, body),
-        "completion": f" {label_str}"
+        "completion": label_str
     }

@@ -1,0 +1,2 @@
+model,split,accuracy,precision,recall,f1,auroc,false_positive_rate,fit_time_sec,latency_ms_per_email,cost_usd_per_1000_emails
+Groq-qwen/qwen3.8-27b (Zero-Shot),val (n=1850),0.3254,0.2864,0.3926,0.3312,,0.7244,0.0,38.12,0.0

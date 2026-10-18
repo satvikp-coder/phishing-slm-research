@@ -1,10 +1,12 @@
-# requirements.txt — Pinned dependencies for phishing-slm-research
-numpy==2.4.0
-pandas==2.3.3
-scikit-learn==1.8.0
+# requirements.txt — Base dependencies for phishing-slm-research
+# For Colab fine-tuning, dependencies are installed unpinned for the smoke test audit,
+# and exact observed versions will be locked into requirements-colab.txt after smoke test verification.
+numpy>=2.0.0
+pandas>=2.0.0
+scikit-learn>=1.5.0
 datasets>=3.0.0
-transformers==4.49.0
-accelerate==1.4.0
-peft==0.14.0
-trl==0.15.2
-bitsandbytes==0.45.3
+transformers>=4.48.0
+accelerate>=1.0.0
+peft>=0.14.0
+trl>=0.20.0
+bitsandbytes>=0.45.0
