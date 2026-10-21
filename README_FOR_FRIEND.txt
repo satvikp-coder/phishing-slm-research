@@ -19,6 +19,14 @@ All you need to do:
 Requirements:
 - Windows 10/11
 - NVIDIA RTX GPU with drivers installed
-- Python 3.10, 3.11, or 3.12 installed (with "Add to PATH" checked)
+- Python 3.10, 3.11, 3.12, or 3.13 installed (with "Add to PATH" checked)
 - Internet connection (first 2 minutes only, to download the base Qwen model)
+
+------------------------------------------------------------------------
+Troubleshooting (RTX 50-series Blackwell GPUs, e.g. RTX 5070):
+If you see "CUDA error: no kernel image is available for execution",
+open Command Prompt and run this 1-line command to upgrade PyTorch for RTX 50-series:
+   pip install --upgrade --force-reinstall torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
+Then double-click "run_training_rtx.bat" again!
 ========================================================================
+

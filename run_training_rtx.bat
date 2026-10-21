@@ -16,10 +16,12 @@ if %ERRORLEVEL% NEQ 0 (
 )
 
 echo [1/3] Checking environment & installing dependencies...
-python -c "import torch; assert torch.cuda.is_available()" >nul 2>nul
+:: Test actual CUDA kernel execution (catches compute capability mismatch like RTX 5070 Blackwell sm_120)
+python -c "import torch; assert torch.cuda.is_available(); x = torch.randn(2, 2, device='cuda'); y = x @ x" >nul 2>nul
 if %ERRORLEVEL% NEQ 0 (
-    echo [INFO] PyTorch with CUDA not found. Installing PyTorch with CUDA support...
-    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu126
+    echo [INFO] PyTorch CUDA acceleration not found or GPU architecture mismatch detected.
+    echo [INFO] Installing/upgrading PyTorch with CUDA 12.8 support (supports RTX 5070, 5080, 5090 Blackwell sm_120)...
+    pip install --upgrade --force-reinstall torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
 )
 
 echo [INFO] Ensuring required libraries are installed...

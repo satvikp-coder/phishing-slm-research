@@ -115,6 +115,28 @@ def main():
     print(f"GPU VRAM:        {total_mem} GB")
     print(f"PyTorch Version: {torch.__version__}")
 
+    # Proactive CUDA kernel architecture check (detects mismatches like RTX 5070 Blackwell sm_120)
+    if cuda_available:
+        try:
+            _test_t = torch.randn(2, 2, device="cuda")
+            _test_res = _test_t @ _test_t
+            del _test_t, _test_res
+            torch.cuda.empty_cache()
+        except RuntimeError as e:
+            err_str = str(e).lower()
+            if "no kernel image" in err_str or "cuda error" in err_str:
+                print("\n" + "=" * 75)
+                print("[CRITICAL CUDA ARCHITECTURE MISMATCH DETECTED!]")
+                print(f"Device: {device_name}")
+                print(f"Current PyTorch ({torch.__version__}) does NOT have CUDA kernels compiled for this GPU architecture!")
+                print("For NVIDIA RTX 50-series GPUs (Blackwell sm_120), you must upgrade to PyTorch with CUDA 12.8+.")
+                print("\nTo fix this instantly, run this command in your Command Prompt / Terminal:")
+                print("   pip install --upgrade --force-reinstall torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128")
+                print("=" * 75 + "\n")
+                sys.exit(1)
+            else:
+                raise e
+
     # Determine optimal precision
     if cuda_available and torch.cuda.is_bf16_supported():
         compute_dtype = torch.bfloat16
@@ -242,8 +264,7 @@ def main():
         model_id,
         quantization_config=bnb_config if (cuda_available and args.load_in_4bit) else None,
         device_map="auto" if cuda_available else None,
-        dtype=compute_dtype if cuda_available else torch.float32,
-        torch_dtype=compute_dtype if cuda_available else torch.float32
+        dtype=compute_dtype if cuda_available else torch.float32
     )
     model.config.use_cache = False
 
