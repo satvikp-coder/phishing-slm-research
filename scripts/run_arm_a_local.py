@@ -82,15 +82,16 @@ def main():
     parser.add_argument("--lr", type=float, default=2e-4, help="Learning rate (default: 2e-4)")
     parser.add_argument("--save_steps", type=int, default=200, help="Checkpoint frequency in steps")
     parser.add_argument("--smoke_test", action="store_true", help="Run 40-step smoke test only")
+    parser.add_argument("--load_in_4bit", action="store_true", default=False, help="Use 4-bit quantization (optional, only for GPUs with <6GB VRAM)")
     args = parser.parse_args()
 
     # 1. Imports
     try:
         import torch
         from datasets import Dataset
-        from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig, set_seed
+        from transformers import AutoTokenizer, AutoModelForCausalLM, set_seed
         from transformers.trainer_utils import get_last_checkpoint
-        from peft import LoraConfig, get_peft_model, TaskType, prepare_model_for_kbit_training
+        from peft import LoraConfig, get_peft_model, TaskType
         from trl import SFTTrainer, SFTConfig
         from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
     except ImportError as e:
@@ -222,33 +223,37 @@ def main():
         assert len(unmasked) == len(c_ids)
     print("--- [VERIFIED] Prompt tokens masked (-100); only completion tokens are trained! ---\n")
 
-    # 7. Model Loading (4-bit QLoRA)
-    bnb_config = BitsAndBytesConfig(
-        load_in_4bit=True,
-        bnb_4bit_quant_type="nf4",
-        bnb_4bit_compute_dtype=compute_dtype,
-        bnb_4bit_use_double_quant=True
-    )
+    # 7. Model Loading
+    if args.load_in_4bit:
+        from transformers import BitsAndBytesConfig
+        from peft import prepare_model_for_kbit_training
+        bnb_config = BitsAndBytesConfig(
+            load_in_4bit=True,
+            bnb_4bit_quant_type="nf4",
+            bnb_4bit_compute_dtype=compute_dtype,
+            bnb_4bit_use_double_quant=True
+        )
+        print(f"Loading {model_id} in 4-bit NF4 (QLoRA)...")
+    else:
+        bnb_config = None
+        print(f"Loading {model_id} in native {compute_dtype} (Standard 16-bit LoRA — no bitsandbytes needed)...")
 
-    print(f"Loading {model_id} in 4-bit NF4...")
     model = AutoModelForCausalLM.from_pretrained(
         model_id,
-        quantization_config=bnb_config if cuda_available else None,
+        quantization_config=bnb_config if (cuda_available and args.load_in_4bit) else None,
         device_map="auto" if cuda_available else None,
         dtype=compute_dtype if cuda_available else torch.float32,
         torch_dtype=compute_dtype if cuda_available else torch.float32
     )
     model.config.use_cache = False
 
-    if cuda_available:
+    if args.load_in_4bit and cuda_available:
         model = prepare_model_for_kbit_training(model)
-
-    # Cast non-quantized modules to float32
-    for name, module in model.named_modules():
-        if hasattr(module, 'weight') and module.weight is not None:
-            if not hasattr(module, 'quant_state'):
-                if module.weight.dtype == torch.bfloat16:
-                    module.to(torch.float32)
+        for name, module in model.named_modules():
+            if hasattr(module, 'weight') and module.weight is not None:
+                if not hasattr(module, 'quant_state'):
+                    if module.weight.dtype == torch.bfloat16:
+                        module.to(torch.float32)
 
     lora_config = LoraConfig(
         r=16,
@@ -260,13 +265,13 @@ def main():
     )
     model = get_peft_model(model, lora_config)
 
-    for name, param in model.named_parameters():
-        if param.requires_grad:
-            param.data = param.data.to(torch.float32)
+    if args.load_in_4bit:
+        for name, param in model.named_parameters():
+            if param.requires_grad:
+                param.data = param.data.to(torch.float32)
 
     trainable_dtypes = set(p.dtype for p in model.parameters() if p.requires_grad)
     print(f"Trainable Parameter Dtypes: {trainable_dtypes}")
-    assert torch.bfloat16 not in trainable_dtypes
     model.print_trainable_parameters()
 
     # 8. Checkpoint Resumption Check
@@ -284,6 +289,10 @@ def main():
     has_completion_loss = 'completion_only_loss' in inspect.signature(SFTConfig).parameters
     has_max_seq_length = 'max_seq_length' in inspect.signature(SFTConfig).parameters
 
+    # Precision setup: Native BFloat16 on modern GPUs (RTX 50xx/40xx/30xx)
+    use_bf16 = cuda_available and (compute_dtype == torch.bfloat16) and not args.load_in_4bit
+    use_fp16 = cuda_available and (compute_dtype == torch.float16) and not args.load_in_4bit
+
     sft_kwargs = {
         "output_dir": args.output_dir,
         "num_train_epochs": epochs,
@@ -295,8 +304,8 @@ def main():
         "save_strategy": save_strategy,
         "save_steps": args.save_steps if not args.smoke_test else 500,
         "save_total_limit": 2,
-        "fp16": False,  # Managed internally by bnb_4bit_compute_dtype
-        "bf16": False,
+        "fp16": use_fp16,
+        "bf16": use_bf16,
         "report_to": "none",
         "seed": seed
     }
