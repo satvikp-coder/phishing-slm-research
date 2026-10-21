@@ -11,5 +11,6 @@ finetuning/checkpoints/*
 # ... except small results tables, which ARE research artifacts
 !eval/results/*.csv
 !eval/results/
-!eval/results/quarantine/*.csv
 !eval/results/quarantine/
+*.zip
+arm_a_results_package/
