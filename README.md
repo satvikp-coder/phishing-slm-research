@@ -32,8 +32,9 @@ All evaluations are conducted strictly on the untouched Validation Split (`phish
 | **TF-IDF + Linear SVM** | Classical ML (Trained) | **97.02%** | **0.9677** | **0.9615** | **0.9646** | **0.9960** | **2.34%** | **0.51 ms** | $0.00 |
 | **Qwen2.5-1.5B-Instruct** | Zero-Shot SLM (Untrained) | **63.64%** | **0.5661** | **0.5970** | **0.5811** | — | **33.47%** | **432.53 ms** | $0.00 |
 | **Qwen-27B (Groq Cloud)** | Zero-Shot LLM (Untrained) | **32.54%** | **0.2864** | **0.3926** | **0.3312** | — | **72.44%** | **38.12 ms** | $0.00 |
+| **Qwen2.5-1.5B (Arm A — Naive QLoRA)** | **Fine-Tuned SLM (Trained)** | **99.15%** | **0.9880** | **0.9920** | **0.9900** | **0.9916** | **0.88%** | **167.56 ms** | $0.00 |
 
-*Data source: [`eval/results/baseline_results.csv`](eval/results/baseline_results.csv)*
+*Data source: [`eval/results/baseline_results.csv`](eval/results/baseline_results.csv) & [`eval/results/preds_qwen2_5_1_5b_naive_val.csv`](eval/results/preds_qwen2_5_1_5b_naive_val.csv)*
 
 ---
 
