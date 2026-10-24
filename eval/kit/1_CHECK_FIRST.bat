@@ -132,6 +132,19 @@ if %errorlevel% neq 0 (
     )
 )
 
+:: Check if PyTorch has CUDA acceleration enabled
+"%VENV_PY%" -c "import torch; exit(0 if torch.cuda.is_available() else 1)" >nul 2>&1
+if !errorlevel! neq 0 (
+    echo.
+    echo [NOTICE] PyTorch is currently running in CPU mode.
+    echo Your Legion Pro 5 has an NVIDIA GPU. For 50x faster GPU verification:
+    set /p INSTALL_CUDA="Download official PyTorch CUDA 12.4 for your NVIDIA GPU? (Y/N): "
+    if /i "!INSTALL_CUDA!"=="Y" (
+        echo Downloading and installing PyTorch with CUDA support...
+        "%VENV_PIP%" install torch torchvision --index-url https://download.pytorch.org/whl/cu124
+    )
+)
+
 echo.
 echo Running pre-flight system, integrity, and offline readiness checks...
 echo.

@@ -1,5 +1,6 @@
 # Small but Sufficient? SLM vs. LLM Phishing-Email Detection
 
+[![Open In Colab: Arm A Verification & Latency](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/satvikp-coder/phishing-slm-research/blob/main/eval/Arm_A_Colab_Verification.ipynb)
 [![Open In Colab: QLoRA Fine-Tuning](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/satvikp-coder/phishing-slm-research/blob/main/finetuning/Phishing_SLM_QLoRA_Starter.ipynb)
 [![Open In Colab: Week 4 Zero-Shot Baselines](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/satvikp-coder/phishing-slm-research/blob/main/eval/Week4_ZeroShot_Baselines.ipynb)
 [![Open In Colab: Week 3 Classical Baseline](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/satvikp-coder/phishing-slm-research/blob/main/baselines/Week3_Classical_Baseline.ipynb)
