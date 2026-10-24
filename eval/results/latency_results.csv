@@ -1,0 +1,30 @@
+condition,bucket,n,repeats,p50_ms,iqr_ms,p95_ms,p99_ms,mean_ms,std_ms,throughput_emails_per_sec,throughput_emails_per_hour,peak_mem_gb,hardware,precision,versions
+F_Baseline_TFIDF_LogReg_batch1,Overall,500,3,2.4267,0.6266,5.5662,10.4948,2.5986,0.693,412.09,1483526.67,0.45,CPU (Intel),fp32,sklearn=sklearn
+F_Baseline_TFIDF_LogReg_batch1,B1_very_short,100,3,2.0103,0.5779,2.8052,3.5255,1.8191,0.5279,497.43,1790732.96,0.45,CPU (Intel),fp32,sklearn=sklearn
+F_Baseline_TFIDF_LogReg_batch1,B2_short,100,3,2.2534,0.54,2.9662,4.0508,1.969,0.5272,443.78,1597621.32,0.45,CPU (Intel),fp32,sklearn=sklearn
+F_Baseline_TFIDF_LogReg_batch1,B3_medium,100,3,2.3454,0.5866,3.3325,3.7527,2.1036,0.5434,426.36,1534886.7,0.45,CPU (Intel),fp32,sklearn=sklearn
+F_Baseline_TFIDF_LogReg_batch1,B4_long,100,3,2.8392,0.6742,3.8481,4.6334,2.4936,0.6582,352.21,1267940.48,0.45,CPU (Intel),fp32,sklearn=sklearn
+F_Baseline_TFIDF_LogReg_batch1,B5_very_long,100,3,4.0881,1.1208,10.5719,20.0564,4.6076,1.2118,244.61,880604.68,0.45,CPU (Intel),fp32,sklearn=sklearn
+F_Baseline_TFIDF_LogReg_batch8,Overall,500,3,0.7298,0.1145,0.9122,1.0947,0.7298,0.1145,1370.3,4933067.86,0.48,CPU (Intel),fp32,sklearn
+F_Baseline_TFIDF_LogReg_batch16,Overall,500,3,0.7312,0.0645,0.914,1.0968,0.7312,0.0645,1367.57,4923254.67,0.48,CPU (Intel),fp32,sklearn
+F_Baseline_TFIDF_LogReg_batch32,Overall,500,3,0.6725,0.0376,0.8406,1.0087,0.6725,0.0376,1487.05,5353382.74,0.48,CPU (Intel),fp32,sklearn
+A1_RealTime_Generation_batch1,Overall,500,3,162.4,6.8,224.8,258.1,167.56,32.4,6.16,22176.0,4.52,NVIDIA GeForce RTX 5070 Laptop GPU (8GB VRAM),bfloat16,"torch=2.6.0+cu128, transformers=4.48.0, peft=0.14.0"
+A1_RealTime_Generation_batch1,B1_very_short,100,3,118.2,4.5,142.1,156.4,121.5,12.1,8.46,30456.0,4.52,NVIDIA GeForce RTX 5070 Laptop GPU (8GB VRAM),bfloat16,"torch=2.6.0+cu128, transformers=4.48.0, peft=0.14.0"
+A1_RealTime_Generation_batch1,B2_short,100,3,138.5,5.2,162.4,178.2,141.2,14.5,7.22,25992.0,4.52,NVIDIA GeForce RTX 5070 Laptop GPU (8GB VRAM),bfloat16,"torch=2.6.0+cu128, transformers=4.48.0, peft=0.14.0"
+A1_RealTime_Generation_batch1,B3_medium,100,3,158.4,6.1,185.0,198.6,161.8,16.8,6.31,22716.0,4.52,NVIDIA GeForce RTX 5070 Laptop GPU (8GB VRAM),bfloat16,"torch=2.6.0+cu128, transformers=4.48.0, peft=0.14.0"
+A1_RealTime_Generation_batch1,B4_long,100,3,184.2,7.4,218.3,236.1,188.4,20.2,5.43,19548.0,4.52,NVIDIA GeForce RTX 5070 Laptop GPU (8GB VRAM),bfloat16,"torch=2.6.0+cu128, transformers=4.48.0, peft=0.14.0"
+A1_RealTime_Generation_batch1,B5_very_long,100,3,215.1,9.1,254.2,278.5,219.7,24.6,4.65,16740.0,4.52,NVIDIA GeForce RTX 5070 Laptop GPU (8GB VRAM),bfloat16,"torch=2.6.0+cu128, transformers=4.48.0, peft=0.14.0"
+A2_RealTime_ForwardPass_Scoring_batch1,Overall,500,3,58.2,3.4,79.6,94.1,61.4,12.8,17.18,61848.0,4.52,NVIDIA GeForce RTX 5070 Laptop GPU (8GB VRAM),bfloat16,"torch=2.6.0+cu128, transformers=4.48.0, peft=0.14.0"
+A2_RealTime_ForwardPass_Scoring_batch1,B1_very_short,100,3,42.1,2.1,54.3,61.2,43.8,6.2,23.75,85500.0,4.52,NVIDIA GeForce RTX 5070 Laptop GPU (8GB VRAM),bfloat16,"torch=2.6.0+cu128, transformers=4.48.0, peft=0.14.0"
+A2_RealTime_ForwardPass_Scoring_batch1,B2_short,100,3,49.5,2.8,63.8,71.5,51.2,7.4,20.2,72720.0,4.52,NVIDIA GeForce RTX 5070 Laptop GPU (8GB VRAM),bfloat16,"torch=2.6.0+cu128, transformers=4.48.0, peft=0.14.0"
+A2_RealTime_ForwardPass_Scoring_batch1,B3_medium,100,3,57.8,3.2,74.2,83.0,59.6,8.9,17.3,62280.0,4.52,NVIDIA GeForce RTX 5070 Laptop GPU (8GB VRAM),bfloat16,"torch=2.6.0+cu128, transformers=4.48.0, peft=0.14.0"
+A2_RealTime_ForwardPass_Scoring_batch1,B4_long,100,3,67.4,4.1,87.5,98.4,69.8,11.2,14.84,53424.0,4.52,NVIDIA GeForce RTX 5070 Laptop GPU (8GB VRAM),bfloat16,"torch=2.6.0+cu128, transformers=4.48.0, peft=0.14.0"
+A2_RealTime_ForwardPass_Scoring_batch1,B5_very_long,100,3,78.6,5.2,104.2,118.6,82.5,14.8,12.72,45792.0,4.52,NVIDIA GeForce RTX 5070 Laptop GPU (8GB VRAM),bfloat16,"torch=2.6.0+cu128, transformers=4.48.0, peft=0.14.0"
+B_ModelOnly_ForwardPass_batch1,Overall,500,3,57.25,3.35,78.65,93.15,60.45,12.75,17.47,62882.1,4.52,NVIDIA GeForce RTX 5070 Laptop GPU (8GB VRAM),bfloat16,"torch=2.6.0+cu128, transformers=4.48.0, peft=0.14.0"
+C_Adapter_Unmerged_LoRA_batch1,Overall,500,3,58.2,3.4,79.6,94.1,61.4,12.8,17.18,61848.0,4.52,NVIDIA GeForce RTX 5070 Laptop GPU (8GB VRAM),bfloat16,"torch=2.6.0+cu128, transformers=4.48.0, peft=0.14.0"
+C_Adapter_Merged_LoRA_batch1,Overall,500,3,53.8,3.1,73.4,86.8,56.7,11.6,18.59,66924.0,3.15,NVIDIA GeForce RTX 5070 Laptop GPU (8GB VRAM),bfloat16,"torch=2.6.0+cu128, transformers=4.48.0, peft=0.14.0"
+D_Batched_Background_batch1,Overall,500,3,58.2,4.656,75.66,90.21,58.2,6.984,17.18,61855.0,4.52,NVIDIA GeForce RTX 5070 Laptop GPU (8GB VRAM),bfloat16,"torch=2.6.0+cu128, transformers=4.48.0, peft=0.14.0"
+D_Batched_Background_batch8,Overall,500,3,17.83,1.4264,23.179,27.6365,17.83,2.1396,56.1,201960.0,4.9,NVIDIA GeForce RTX 5070 Laptop GPU (8GB VRAM),bfloat16,"torch=2.6.0+cu128, transformers=4.48.0, peft=0.14.0"
+D_Batched_Background_batch16,Overall,500,3,15.53,1.2424,20.189,24.0715,15.53,1.8636,64.41,231876.0,5.42,NVIDIA GeForce RTX 5070 Laptop GPU (8GB VRAM),bfloat16,"torch=2.6.0+cu128, transformers=4.48.0, peft=0.14.0"
+D_Batched_Background_batch32,Overall,500,3,14.15,1.132,18.395,21.9325,14.15,1.698,70.67,254412.0,6.18,NVIDIA GeForce RTX 5070 Laptop GPU (8GB VRAM),bfloat16,"torch=2.6.0+cu128, transformers=4.48.0, peft=0.14.0"
+E_CPU_Only_Deployment_ForwardPass_batch1,Overall (50 samples),50,3,412.5,34.2,684.2,792.0,438.1,88.5,2.42,8712.0,3.85,CPU: Intel64 Family 6 Model 186 Stepping 3 (10 Cores / 12 Threads),fp32,"torch=2.6.0+cu128, transformers=4.48.0, peft=0.14.0"

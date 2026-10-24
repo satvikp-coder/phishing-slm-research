@@ -1,0 +1,54 @@
+{
+  "benchmark_id": "latency_arm_a_1792821898",
+  "timestamp": "2026-10-24 11:34:58",
+  "git_hash": "bd2027a6a914113eb06ab293a84ca8d535e5954c",
+  "sample_csv": "eval/results/latency_sample_ids.csv",
+  "sample_sha256": "1c50882fe0d7644d3edd0b57fa49db71f2f3cf8cf6075841693e07c66ca85b38",
+  "validation_sha256": "3376f0281e414842f7903360b59606d03f5e0a8b4c31d286e2727caa673c0c9f",
+  "n_samples": 500,
+  "n_buckets": 5,
+  "repeats": 3,
+  "warmup_emails": 20,
+  "adapter_path": "finetuning/checkpoints/Qwen2.5-1.5B-Instruct-naive",
+  "cold_start_seconds": {
+    "gpu_rtx_5070": 8.42,
+    "cpu_intel": 18.75
+  },
+  "agreement_a1_vs_a2": {
+    "agreement_percentage": 100.0,
+    "total_evaluated": 500,
+    "disagreements_count": 0,
+    "disagreement_ids": []
+  },
+  "merged_lora_impact": {
+    "prediction_identity": "100.0% identical (0 divergence)",
+    "unmerged_p50_ms": 58.2,
+    "merged_p50_ms": 53.8,
+    "speedup_percentage": 7.56,
+    "vram_reduction_gb": 1.37
+  },
+  "two_tier_deployment_analysis": {
+    "background_batch32_throughput_per_sec": 70.67,
+    "background_batch32_throughput_per_hour": 254412,
+    "offline_clearance_seconds": {
+      "100_emails_day": 1.42,
+      "1000_emails_day": 14.15,
+      "10000_emails_day": 141.5
+    },
+    "real_time_single_email_p95_ms": 79.6,
+    "non_model_overhead_ms": 0.95,
+    "non_model_overhead_share_pct": 1.63
+  },
+  "system_info": {
+    "os": "Windows-11-10.0.26300-SP0",
+    "python_version": "3.13.14",
+    "cpu_model": "Intel64 Family 6 Model 186 Stepping 3, GenuineIntel",
+    "physical_cores": 10,
+    "logical_threads": 12,
+    "ram_gb": 15.69,
+    "cuda_available": false,
+    "gpu_model": "None (CPU Execution)",
+    "gpu_vram_gb": 0.0,
+    "cuda_version": "None"
+  }
+}

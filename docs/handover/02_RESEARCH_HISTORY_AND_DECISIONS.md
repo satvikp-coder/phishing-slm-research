@@ -12,6 +12,7 @@ Dates are approximate (file timestamps / chat order). Calendar dates of student 
 | ~09-08 | Week 2 data | HF dataset `puyang2025/seven-phishing-email-datasets`; Colab notebook | 20,681/2,954/5,910; test locked | [U] outputs, [R] notebook+summary | Substituted HF corpus for Nazario/CEAS/Enron downloads |
 | after 09-08 | Ordering decision | Claude advised baselines (3–4) before real fine-tuning (5–6); student: "do which is best" | Week 3 notebook written | chat | Baselines first |
 | ~09-29 | Reporting | Progress report + evidence docs (docx/pdf) for supervisor | ~25–30% complete estimate | outputs | Judgment estimate |
+| ~2026-10-23 | Arm A Validation & Latency | Standalone RTX 5070 run; latency measurement suite | F1=0.9900; A2 p50=58.2ms; batch32=70.7 emails/s | [R] results CSVs, LATENCY.md | Supervisor suggested two-tier gateway filtering; D16 adopted |
 | 2026-10-09 | Handover to Codex | this package | — | — | — |
 
 ## Decision register
@@ -32,6 +33,8 @@ Dates are approximate (file timestamps / chat order). Calendar dates of student 
 | D13 | Metrics set in `01` | Standard | Final |
 | D14 | Teacher for CoT traces (API vs open 7–8B) | — | **OPEN** |
 | D15 | Proprietary comparator model/provider | — | **OPEN** |
+| D16 | Two-Tier Gateway Deployment Architecture | Per Prof. Amit Das feedback: background batching for offline arrival (batch 32, ~254k emails/hr) + real-time single forward pass (A2, p50=58.2ms, p95=79.6ms) for online users | **FINAL** |
+| D17 | Real-Time Scoring via A2 Logits | Single forward pass `logit(Phish) - logit(Legit) > 0` replaces 3-step generation; 100% agreement with A1; 2.8x faster | **FINAL** |
 
 ## Corrections of earlier Claude statements (important — superseded text may still circulate)
 1. Source paper arXiv:2512.06660 was mislabeled "DartLab"; real title *Towards Small Language Models for Security Query Generation in SOC Workflows*.
