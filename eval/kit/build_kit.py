@@ -160,11 +160,11 @@ def main():
     print("\n[Stage 7/7] Generating data/manifest.json with SHA256 checksums...")
     manifest = {}
     for root, dirs, files in os.walk(TARGET_KIT_DIR):
-        # Exclude OUTPUT, temporary files, and manifest.json itself
-        if "OUTPUT" in root or ".venv" in root:
+        # Exclude OUTPUT, temporary files, virtualenv, and pycache
+        if "OUTPUT" in root or ".venv" in root or "__pycache__" in root:
             continue
         for f in files:
-            if f == "manifest.json":
+            if f == "manifest.json" or f.endswith(".pyc") or f.endswith(".pyo"):
                 continue
             fp = os.path.join(root, f)
             rel_p = os.path.relpath(fp, TARGET_KIT_DIR)

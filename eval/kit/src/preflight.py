@@ -97,6 +97,15 @@ def main():
                 manifest_data = json.load(f)
             manifest_ok = True
             for rel_path, expected_sha in manifest_data.items():
+                # Ignore self-manifest, compiled bytecode, caches, and output directories
+                norm_rel = rel_path.replace("\\", "/").lower()
+                if norm_rel in ("data/manifest.json", "manifest.json") or "manifest.json" in norm_rel:
+                    continue
+                if "__pycache__" in norm_rel or norm_rel.endswith(".pyc") or norm_rel.endswith(".pyo"):
+                    continue
+                if norm_rel.startswith("output/") or "/output/" in norm_rel:
+                    continue
+
                 abs_path = os.path.join(kit_root, rel_path)
                 if not os.path.exists(abs_path):
                     report(f"Missing required file: {rel_path}", ok=False)

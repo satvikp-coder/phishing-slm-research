@@ -18,14 +18,24 @@ echo.
 :: Ensure OUTPUT directory exists
 if not exist "%~dp0OUTPUT" mkdir "%~dp0OUTPUT"
 
-:: Locate Python
+:: Locate Python (Python 3.11 is required for CUDA GPU acceleration)
 set "PY_CMD="
 
+:: First check if .venv already exists
 if exist "%~dp0.venv\Scripts\python.exe" (
-    set "PY_CMD=%~dp0.venv\Scripts\python.exe"
-    goto :python_found
+    "%~dp0.venv\Scripts\python.exe" -c "import sys; sys.exit(0 if sys.version_info[:2]==(3,11) else 1)" >nul 2>&1
+    if !errorlevel! equ 0 (
+        set "PY_CMD=%~dp0.venv\Scripts\python.exe"
+        goto :python_found
+    ) else (
+        echo [WARNING] Existing .venv uses Python != 3.11.
+        echo NVIDIA CUDA GPU wheels require Python 3.11.
+        echo Rebuilding .venv with Python 3.11 is recommended for GPU acceleration.
+        echo.
+    )
 )
 
+:: Search specifically for Python 3.11
 where py >nul 2>&1
 if %errorlevel% equ 0 (
     py -3.11 -c "import sys" >nul 2>&1
@@ -35,15 +45,47 @@ if %errorlevel% equ 0 (
     )
 )
 
-where python >nul 2>&1
-if %errorlevel% equ 0 (
-    set "PY_CMD=python"
+if exist "%LOCALAPPDATA%\Programs\Python\Python311\python.exe" (
+    set "PY_CMD=%LOCALAPPDATA%\Programs\Python\Python311\python.exe"
     goto :python_found
 )
 
-echo [ERROR] No compatible Python installation found on this computer.
+if exist "%ProgramFiles%\Python311\python.exe" (
+    set "PY_CMD=%ProgramFiles%\Python311\python.exe"
+    goto :python_found
+)
+
+:: Check if default 'python' is 3.11
+where python >nul 2>&1
+if %errorlevel% equ 0 (
+    python -c "import sys; sys.exit(0 if sys.version_info[:2]==(3,11) else 1)" >nul 2>&1
+    if !errorlevel! equ 0 (
+        set "PY_CMD=python"
+        goto :python_found
+    )
+)
+
+:: If Python 3.11 not found, check if ANY python is present
+where python >nul 2>&1
+if %errorlevel% equ 0 (
+    echo [NOTICE] Found Python, but it is not version 3.11.
+    echo The offline NVIDIA GPU CUDA acceleration requires Python 3.11.
+    echo.
+    echo If you want FULL GPU acceleration on your NVIDIA GPU:
+    echo   1. Run the installer: "%~dp0prereq\python-3.11.9-amd64.exe"
+    echo   2. Delete the .venv folder (if present)
+    echo   3. Run 1_CHECK_FIRST.bat again.
+    echo.
+    set /p USE_FALLBACK="Do you want to continue with CPU-only mode using existing Python? (Y/N): "
+    if /i "!USE_FALLBACK!"=="Y" (
+        set "PY_CMD=python"
+        goto :python_found
+    )
+)
+
+echo [ERROR] Python 3.11 is required for offline GPU verification.
 echo.
-echo Please run the official installer located in the kit:
+echo Please run the official installer included in the kit:
 echo   "%~dp0prereq\python-3.11.9-amd64.exe"
 echo.
 echo (Make sure to check "Add python.exe to PATH" during installation).
