@@ -1,0 +1,36 @@
+{
+  "Method_A2_BS1": {
+    "p50_ms": 119.0535314999579,
+    "q25_ms": 87.47876725055903,
+    "q75_ms": 225.39022649948492,
+    "p95_ms": 387.6050717502494,
+    "p99_ms": 407.54469917023016,
+    "mean_ms": 170.35745501399953,
+    "throughput_eps": 5.870010208345873
+  },
+  "Method_D_Batched": {
+    "2": {
+      "status": "PASS",
+      "throughput_eps": 6.904667201398659,
+      "ms_per_email": 144.8295726400011,
+      "peak_vram_gb": 4.496896743774414
+    },
+    "4": {
+      "status": "PASS",
+      "throughput_eps": 6.442923530369931,
+      "ms_per_email": 155.20904373399938,
+      "peak_vram_gb": 5.615401268005371
+    },
+    "8": {
+      "status": "OOM",
+      "throughput_eps": null,
+      "ms_per_email": null,
+      "peak_vram_gb": 14.56317138671875
+    }
+  },
+  "Backlog_Calculations": {
+    "Optimal_BS": 4,
+    "Hourly_capacity": 23194.52470933175,
+    "Clear_10k_backlog_mins": 25.86817395566656
+  }
+}
