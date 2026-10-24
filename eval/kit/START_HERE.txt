@@ -1,0 +1,54 @@
+================================================================================
+ARM A MODEL VERIFICATION KIT — INSTRUCTIONS FOR RUNNING ON THIS COMPUTER
+================================================================================
+
+Hi! Thank you for helping verify our phishing-detection AI model on your Windows 
+computer. You do not need any coding knowledge. Everything is automated.
+
+Please keep your laptop plugged in to the charger during these tests.
+
+--------------------------------------------------------------------------------
+WHAT TO DOUBLE-CLICK AND IN WHAT ORDER:
+--------------------------------------------------------------------------------
+
+1. Double-click: 1_CHECK_FIRST.bat
+   - What it does : Checks your system, hardware, and files. Prepares everything.
+   - Time taken   : About 1 to 2 minutes.
+   - What to see  : A black window will open, check things, and end with "STATUS: PASS".
+   - If it fails  : If it says Python is missing, run "prereq\python-3.11.9-amd64.exe"
+                    (check "Add Python to PATH" when installing) and try step 1 again.
+
+2. Double-click: 2_QUICK_TEST.bat
+   - What it does : Runs a quick test on 50 sample emails to ensure the model runs
+                    smoothly without running out of memory.
+   - Time taken   : 2 to 8 minutes.
+   - What to see  : Progress messages showing stages 1 through 7, ending with
+                    "SUCCESS: QUICK TEST PASSED!".
+
+3. Double-click: 3_RUN_FULL.bat
+   - What it does : Runs the full verification across all emails and measures how
+                    fast the model processes mail.
+   - Time taken   : 10 to 30 minutes (depending on whether you have an NVIDIA GPU).
+   - What to see  : "SUCCESS: FULL RUN COMPLETE!".
+
+4. Double-click: 4_PACK_RESULTS.bat
+   - What it does : Packages all the results into a single zip file named:
+                    RESULTS_<YourComputerName>_<Date>.zip
+   - Time taken   : 10 seconds.
+   - What to see  : It prints the path to the newly created ZIP file.
+
+--------------------------------------------------------------------------------
+WHAT TO SEND BACK:
+--------------------------------------------------------------------------------
+Copy ONLY the generated file:
+  RESULTS_<YourComputerName>_<Date>.zip
+onto your USB flash drive and send it to Satvik / Prof. Amit Das.
+
+--------------------------------------------------------------------------------
+CLEAN UP:
+--------------------------------------------------------------------------------
+Once the ZIP file is safely copied to your USB flash drive, please DELETE this
+entire verification kit folder from your computer.
+
+THANK YOU FOR YOUR HELP!
+================================================================================

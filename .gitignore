@@ -14,3 +14,5 @@ finetuning/checkpoints/*
 !eval/results/quarantine/
 *.zip
 arm_a_results_package/
+kits/
+OUTPUT_myPC/

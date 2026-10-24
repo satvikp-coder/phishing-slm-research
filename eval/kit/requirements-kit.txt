@@ -1,0 +1,14 @@
+# requirements-kit.txt — Arm A Verification Kit Pinned Dependencies
+# Windows x64 / Python 3.11
+torch
+transformers>=4.48.0
+peft>=0.14.0
+bitsandbytes>=0.43.0
+accelerate>=1.0.0
+scikit-learn>=1.4.0
+scipy>=1.12.0
+pandas>=2.0.0
+numpy>=1.26.0,<3.0.0
+safetensors>=0.4.0
+tokenizers>=0.20.0
+huggingface_hub>=0.25.0
