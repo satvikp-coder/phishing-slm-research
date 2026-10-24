@@ -339,6 +339,7 @@ display(df_neardup)"""))
 
 # Cell 7: Statistical Significance Tests
 cells.append(make_code_cell("""# Step 6: Paired Statistical Significance (McNemar & 1,000 Bootstrap CIs)
+import json
 from scipy.stats import binom
 
 df_lr = pd.read_csv("data/preds_tf-idf_plus_logisticregression_val.csv")
@@ -402,6 +403,9 @@ with open("OUTPUT/step5_paired_significance.json", "w") as f:
 
 # Cell 8: Latency & Throughput Benchmark
 cells.append(make_code_cell("""# Step 7: Latency & Throughput Benchmark (Prof. Amit Das's Architecture)
+import json, time, os
+import numpy as np
+import pandas as pd
 # Fixed sample: 500 validation emails stratified into 5 length buckets (100 each)
 df_sample_ids = pd.read_csv("data/latency_sample_ids.csv")
 df_bench = df_val.merge(df_sample_ids[["email_id"]], on="email_id")
@@ -503,6 +507,9 @@ with open("OUTPUT/step6_latency_summary.json", "w") as f:
 
 # Cell 9: Generate Report & Download ZIP
 cells.append(make_code_cell("""# Step 8: Generate Report & Download Verification Results ZIP
+import os, time, zipfile
+from google.colab import files
+
 report_md = f\"\"\"# Arm A Model Verification & Latency Report (Google Colab T4)
 
 **Date & Time:** {time.strftime('%Y-%m-%d %H:%M:%S')}  
