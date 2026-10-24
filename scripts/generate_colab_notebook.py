@@ -263,9 +263,10 @@ print("=" * 60)
 
 # Per-Source Breakdown
 print("\\n--- Per-Source Subpopulation Breakdown ---")
+src_col = "dataset_name" if "dataset_name" in df_val.columns else "source"
 source_results = []
-for src in sorted(df_val["source"].unique()):
-    sub = df_val[df_val["source"] == src]
+for src in sorted(df_val[src_col].unique()):
+    sub = df_val[df_val[src_col] == src]
     sy_true = sub["label"].values
     sy_pred = (sub["arm_a_pred"] == "Phishing").astype(int).values
     
