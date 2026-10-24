@@ -218,7 +218,11 @@ df_val.to_csv("OUTPUT/arm_a_val_scored.csv", index=False)
 # Compare agreement with original Arm A predictions
 if os.path.exists("data/preds_qwen2_5_1_5b_naive_val.csv"):
     df_orig = pd.read_csv("data/preds_qwen2_5_1_5b_naive_val.csv")
-    agree = (df_val["arm_a_pred"] == df_orig["pred"]).mean()
+    col = "raw_output" if "raw_output" in df_orig.columns else ("pred" if "pred" in df_orig.columns else "y_pred")
+    if col == "y_pred":
+        agree = ((df_val["arm_a_pred"] == "Phishing").astype(int) == df_orig[col]).mean()
+    else:
+        agree = (df_val["arm_a_pred"] == df_orig[col]).mean()
     print(f"Agreement with original Arm A predictions: {agree*100:.2f}%")
     assert agree >= 0.995, f"Agreement {agree*100:.2f}% is below 99.5% threshold!"
 
@@ -340,8 +344,8 @@ df_lr = pd.read_csv("data/preds_tf-idf_plus_logisticregression_val.csv")
 df_svm = pd.read_csv("data/preds_tf-idf_plus_linearsvm_val.csv")
 
 y_arm_a = (df_val["arm_a_pred"] == "Phishing").astype(int).values
-y_lr = (df_lr["pred"] == "Phishing").astype(int).values
-y_svm = (df_svm["pred"] == "Phishing").astype(int).values
+y_lr = df_lr["y_pred"].values if "y_pred" in df_lr.columns else (df_lr["pred"] == "Phishing").astype(int).values
+y_svm = df_svm["y_pred"].values if "y_pred" in df_svm.columns else (df_svm["pred"] == "Phishing").astype(int).values
 y_truth = df_val["label"].values
 
 def exact_mcnemar(y_true, y_pred1, y_pred2):
