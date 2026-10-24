@@ -72,7 +72,8 @@ if torch.cuda.is_available():
 else:
     print("[WARNING] CUDA is not available. Please switch runtime to T4 GPU in Runtime settings.")
 
-print("\\nInstalling required libraries...")
+print("\\nInstalling required libraries and resolving torchao conflict...")
+!pip uninstall -y torchao -q
 !pip install -q transformers peft accelerate scikit-learn scipy pandas numpy tqdm
 
 print("\\n[PASS] Environment ready.")"""))
@@ -123,6 +124,9 @@ print("\\n[PASS] Data and adapter package unpacked and verified successfully!")"
 
 # Cell 3: Load Model & Adapter
 cells.append(make_code_cell("""# Step 2: Load Base Model and Arm A LoRA Adapter
+# Ensure incompatible torchao is removed
+!pip uninstall -y torchao -q
+
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from peft import PeftModel
