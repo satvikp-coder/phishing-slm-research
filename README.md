@@ -7,7 +7,7 @@
 [![Open In Colab: Week 2 Data Acquisition](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/satvikp-coder/phishing-slm-research/blob/main/data/Week2_Data_Acquisition.ipynb)
 
 * **Principal Investigator:** Satvik ([@satvikp-coder](https://github.com/satvikp-coder))
-* **Supervisor:** Prof. Amit Sir
+* **Supervisor:** Prof. Amit Das
 * **Institution:** Ahmedabad University
 * **Evidence Reports:** [Formal Progress Report (Markdown)](docs/PROGRESS_AND_RESULTS_EVIDENCE.md) | [Audit Verification Report](docs/handover/VERIFICATION_REPORT.md)
 
@@ -22,6 +22,23 @@
 **Chain-of-Thought distilled LoRA fine-tuning** will yield significantly smaller accuracy degradation than naive label fine-tuning when transitioning from in-distribution (human-written) phishing to LLM-rephrased adversarial phishing. The explicit reasoning trace teaches transferable diagnostic heuristics (domain/sender mismatch, urgency framing, pretext plausibility) rather than superficial lexical cues that are easily circumvented by paraphrasing.
 
 ---
+
+## Progress
+
+| Stage | Status |
+|---|---|
+| Literature, data acquisition, dedup and 70/10/20 splits (Weeks 1-2) | Done |
+| Classical baselines: TF-IDF + LR, TF-IDF + SVM (Week 3) | Done |
+| Zero-shot baselines: Qwen2.5-1.5B and Qwen-27B (Week 4) | Done |
+| Arm A: naive QLoRA on Qwen2.5-1.5B-Instruct (Week 5) | In progress. Validation result below; not final |
+| Arm B: reasoning-distilled (CoT) QLoRA (Week 6) | Next |
+| Adversarial and AI-rephrased test set (Week 7) | Next |
+| Final evaluation on the locked test set (Week 8) | Next |
+| Ablations, significance tests, write-up (Weeks 9-12) | Next |
+
+**Test set is locked.** `phishing_test.csv` (5,910 emails) has not been used for any result. All numbers below are on the validation split only (n = 2,954).
+
+**Note:** the Arm A row in the table below is a validation-split result from work in progress. It is not a final result and should not be compared with the baselines until the Week 8 test evaluation.
 
 ## 2. Experimental Benchmark Results (Weeks 1–4)
 
